@@ -1,0 +1,4 @@
+name: dogfight
+version: '${project.version}'
+main: xigmatic.me.dogfight.Dogfight
+api-version: '1.20'
