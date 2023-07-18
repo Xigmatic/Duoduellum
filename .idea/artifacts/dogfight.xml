@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="dogfight">
+    <output-path>$USER_HOME$/Downloads/</output-path>
+    <root id="archive" name="dogfight.jar">
+      <element id="module-output" name="dogfight" />
+    </root>
+  </artifact>
+</component>
