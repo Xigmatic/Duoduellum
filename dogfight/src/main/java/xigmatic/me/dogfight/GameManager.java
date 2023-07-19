@@ -5,6 +5,8 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitScheduler;
 
+import java.util.Objects;
+
 public class GameManager {
     private GameState gameState;
     private int timerID;
@@ -39,14 +41,10 @@ public class GameManager {
             }
 
             // Actionbar Display
-            try {
-                if (tickNum > 1200)
-                    Bukkit.getPlayer("Xigmatic").spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent((tickNum / 1200) + ":" + (tickNum % 1200) / 20));
-                else
-                    Bukkit.getPlayer("Xigmatic").spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(String.format("%,.2f", tickNum / 20.0)));
-            } catch (NullPointerException e) {
-                e.printStackTrace();
-            }
+            if (tickNum > 1200)
+                Objects.requireNonNull(Bukkit.getPlayer("Xigmatic")).spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent((tickNum / 1200) + ":" + (tickNum % 1200) / 20));
+            else
+                Objects.requireNonNull(Bukkit.getPlayer("Xigmatic")).spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(String.format("%,.2f", tickNum / 20.0)));
 
             // Decrement
             tickNum--;
