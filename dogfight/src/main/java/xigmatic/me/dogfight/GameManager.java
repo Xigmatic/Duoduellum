@@ -10,7 +10,7 @@ public class GameManager {
     private int timerID;
     private int tickNum;
     private int tickMax;
-    private BukkitScheduler bs = Bukkit.getScheduler();
+    private final BukkitScheduler bs = Bukkit.getScheduler();
 
 
     /**
@@ -39,10 +39,14 @@ public class GameManager {
             }
 
             // Actionbar Display
-            if(tickNum > 1200)
-                Bukkit.getPlayer("Xigmatic").spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent((tickNum/1200) + ":" + (tickNum%1200)/20));
-            else
-                Bukkit.getPlayer("Xigmatic").spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(String.format("%,.2f",tickNum/20.0)));
+            try {
+                if (tickNum > 1200)
+                    Bukkit.getPlayer("Xigmatic").spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent((tickNum / 1200) + ":" + (tickNum % 1200) / 20));
+                else
+                    Bukkit.getPlayer("Xigmatic").spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(String.format("%,.2f", tickNum / 20.0)));
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+            }
 
             // Decrement
             tickNum--;
@@ -53,7 +57,7 @@ public class GameManager {
 
     /**
      * Changes gameState variable
-     * @param newGameState
+     * @param newGameState New game section to transition to
      */
     private void changeGameState(GameState newGameState) {
         gameState = newGameState;
@@ -62,7 +66,7 @@ public class GameManager {
 
     /**
      * Sets tickMax to the number of in-game tick from the time given in seconds
-     * @param seconds
+     * @param seconds Number of secondsd declared for the current gameState
      */
     private void setTimePeriod(int seconds) {
         tickMax = 20 * seconds;
