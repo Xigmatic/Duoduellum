@@ -9,6 +9,10 @@ public final class Dogfight extends JavaPlugin {
     public void onEnable() {
         // Plugin startup logic
         Bukkit.getConsoleSender().sendMessage("DOGFIGHT PLUGIN IS NOW ENABLED");
+
+        GameManager gm = new GameManager();
+
+        gm.testSchedule();
     }
 
     @Override
