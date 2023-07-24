@@ -1,3 +1,9 @@
-xigmatic\me\dogfight\GameManager$1.class
+xigmatic\me\dogfight\EquipmentManager.class
+xigmatic\me\dogfight\tasks\DisplayCountdownTask.class
 xigmatic\me\dogfight\GameState.class
+xigmatic\me\dogfight\inventory\InventoryManager.class
+xigmatic\me\dogfight\RoleManager.class
+xigmatic\me\dogfight\GameManager$1.class
+xigmatic\me\dogfight\DogfightRole.class
+xigmatic\me\dogfight\tasks\CountdownTask.class
 xigmatic\me\dogfight\GameManager.class

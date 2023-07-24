@@ -1,55 +1,61 @@
 package xigmatic.me.dogfight;
 
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
-import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
+import xigmatic.me.dogfight.inventory.InventoryManager;
+import xigmatic.me.dogfight.tasks.CountdownTask;
+import xigmatic.me.dogfight.tasks.DisplayCountdownTask;
 
-import java.util.Objects;
+import javax.management.relation.Role;
 
-public class GameManager {
+public class GameManager implements CommandExecutor {
     private GameState gameState;
-    private int timerID;
-    private int tickNum;
-    private int tickMax;
-    private final BukkitScheduler bs = Bukkit.getScheduler();
-
-
+    private Plugin plugin;
+    private InventoryManager inventoryManager;
+    private RoleManager roleManager;
     /**
      * Creates new GameManager (Not singleton)
      */
-    public GameManager() {
-
+    public GameManager(Dogfight plugin, InventoryManager inventoryManager, RoleManager roleManager) {
+        this.plugin = plugin;
+        this.inventoryManager = inventoryManager;
+        this.roleManager = roleManager;
+        this.gameState = GameState.PENDING;
     }
 
 
     /**
      * Tests timing between events (Timer is displayed on actionbar to check accurate timing)
      */
-    public void testSchedule() {
-        gameState = GameState.WAITING1;
-        setTimePeriod(10);
-        tickNum = tickMax;
+    private void testSchedule() {
+        nextGameState();
+    }
 
-        // Schedules timer task
-        timerID = bs.scheduleSyncRepeatingTask(Dogfight.getPlugin(Dogfight.class), () -> {
 
-            // Checks if timer has run out & sets to next GameState
-            if(tickNum == 0) {
-                nextGameState();
-                tickNum = tickMax;
-            }
+    /**
+     * Pauses current schedule by cancelling the current task
+     */
+    private boolean pauseSchedule() {
+        if(currentTask != null && this.currentTask.pause()) {
+            return true;
+        }
+        return false;
+    }
 
-            // Actionbar Display
-            if (tickNum > 1200)
-                Objects.requireNonNull(Bukkit.getPlayer("Xigmatic")).spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent((tickNum / 1200) + ":" + (tickNum % 1200) / 20));
-            else
-                Objects.requireNonNull(Bukkit.getPlayer("Xigmatic")).spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(String.format("%,.2f", tickNum / 20.0)));
 
-            // Decrement
-            tickNum--;
-
-        }, 0, 1);
+    /**
+     *
+     */
+    private boolean resumeSchedule() {
+        if(currentTask != null && this.currentTask.resume()) {
+            return true;
+        }
+        return false;
     }
 
 
@@ -58,16 +64,18 @@ public class GameManager {
      * @param newGameState New game section to transition to
      */
     private void changeGameState(GameState newGameState) {
-        gameState = newGameState;
+        this.gameState = newGameState;
     }
 
 
+    private CountdownTask currentTask;
     /**
-     * Sets tickMax to the number of in-game tick from the time given in seconds
-     * @param seconds Number of secondsd declared for the current gameState
+     * Sets the current task running as well as the current runnable being run
+     * @param runnable This will be run every in-game tick
      */
-    private void setTimePeriod(int seconds) {
-        tickMax = 20 * seconds;
+    private void setTask(CountdownTask runnable) {
+        this.currentTask = runnable;
+        runnable.start();
     }
 
 
@@ -76,70 +84,105 @@ public class GameManager {
      */
     private void nextGameState() {
         switch(gameState) {
+            default:
+                break;
+            case PENDING:
+                // WAITING1 Timer
+                setTask(new CountdownTask(() -> {
+                    Bukkit.getPlayer("Xigmatic").sendMessage("erm");
+                    nextGameState();
+                },5));
+
+                changeGameState(GameState.WAITING1);
+                break;
             case WAITING1:
+                // SELECTING1 Timer
+                setTask(new DisplayCountdownTask(() -> {
+                    Bukkit.getPlayer("Xigmatic").sendMessage("erm");
+                },10));
 
-
-                setTimePeriod(30);
                 changeGameState(GameState.SELECTING1);
                 break;
             case SELECTING1:
 
 
-                setTimePeriod(15);
+
                 changeGameState(GameState.PREROUND1);
                 break;
             case PREROUND1:
 
 
-                setTimePeriod(90);
+
                 changeGameState(GameState.ROUND1);
                 break;
             case ROUND1:
 
 
-                setTimePeriod(10);
+
                 changeGameState(GameState.POSTROUND1);
                 break;
             case POSTROUND1:
 
 
-                setTimePeriod(10);
+
                 changeGameState(GameState.WAITING2);
                 break;
             case WAITING2:
 
 
-                setTimePeriod(30);
+
                 changeGameState(GameState.SELECTING2);
                 break;
             case SELECTING2:
 
 
-                setTimePeriod(15);
+
                 changeGameState(GameState.PREROUND2);
                 break;
             case PREROUND2:
 
 
-                setTimePeriod(90);
+
                 changeGameState(GameState.ROUND2);
                 break;
             case ROUND2:
 
 
-                setTimePeriod(10);
+
                 changeGameState(GameState.POSTROUND2);
                 break;
             case POSTROUND2:
 
 
-                setTimePeriod(30);
+
                 changeGameState(GameState.FINISH);
                 break;
-            default:
-                setTimePeriod(0);
-                bs.cancelTask(timerID);
-                break;
         }
+    }
+
+
+    // Commands
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        // testSchedule
+        if(label.equalsIgnoreCase("testSchedule")) {
+            testSchedule();
+
+            return true;
+        }
+
+        // pauseSchedule
+        if(label.equalsIgnoreCase("pauseSchedule")) {
+            if (!pauseSchedule())
+                sender.sendMessage("No schedule is currently running or is already paused");
+        }
+
+        // resumeSchedule
+        if(label.equalsIgnoreCase("resumeSchedule")) {
+            if (!resumeSchedule())
+                sender.sendMessage("No schedule is currently paused");
+        }
+
+        return false;
     }
 }

@@ -2,3 +2,16 @@ name: dogfight
 version: '${project.version}'
 main: xigmatic.me.dogfight.Dogfight
 api-version: '1.20'
+commands:
+  testSchedule:
+    description: Visually shows the Dogfight gameplay schedule without any actions
+  pauseSchedule:
+    description: Pauses current running schedule
+  resumeSchedule:
+    description: Resumes current schedule if paused
+  openTestInv:
+    description: Opens test inventory
+  giveEquipment:
+    description: Manually gives equipment to all players depending on what role they currently are
+  testRider:
+    description: Tests elytra ride with Xigmatic and Aristratus
