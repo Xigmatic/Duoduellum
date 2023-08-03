@@ -2,6 +2,7 @@ package xigmatic.me.dogfight;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
@@ -50,7 +51,7 @@ public class RoleManager {
      */
     private void giveSniper(Player player) {
         ItemStack crossbow = new ItemStack(Material.CROSSBOW);
-
+        crossbow.addUnsafeEnchantment(Enchantment.QUICK_CHARGE, 5);
 
         // Gives player final item
         player.getInventory().setItem(0, crossbow);

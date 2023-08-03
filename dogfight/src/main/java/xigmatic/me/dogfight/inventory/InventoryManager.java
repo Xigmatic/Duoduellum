@@ -9,9 +9,12 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDropItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
@@ -57,14 +60,30 @@ public class InventoryManager implements CommandExecutor, Listener {
 
     /**
      * Click listener for selection screen
-     * @param event
+     * @param event Event
      */
     @EventHandler
     public void onClick(InventoryClickEvent event) {
         Player p = (Player) event.getWhoClicked();
 
-        if(event.getCurrentItem().getType() == Material.AIR || event.getInventory().getType() != InventoryType.HOPPER)
+        // Checks if an item was clicked or the inventory type is "hopper"
+        if (event.getCurrentItem().getType() == Material.AIR)
             return;
+
+        // Checks if the inventory type is "hopper" and will cancel the inventory move event but not execute any selection code
+        if (event.getInventory().getType() != InventoryType.HOPPER) {
+            // Cancels event
+            event.setCancelled(true);
+
+            // Refreshes inventory after 2 ticks
+            Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
+                p.updateInventory();
+                p.closeInventory();
+            }, 2);
+            return;
+        }
+
+        // Beginning of selection logic
 
         // Cancels event
         event.setCancelled(true);
@@ -81,6 +100,18 @@ public class InventoryManager implements CommandExecutor, Listener {
         } else if (event.getCurrentItem().getType() == Material.ELYTRA) {
             roleManager.setGlider(p);
         }
+    }
+
+
+    /**
+     * Item Drop listener to cancel any attempts to drop items
+     * @param event Event
+     */
+    @EventHandler
+    public void onDrop(PlayerDropItemEvent event) {
+        if(event.getPlayer().getOpenInventory().getType() == InventoryType.PLAYER)
+            // Cancels event
+            event.setCancelled(true);
     }
 
 
