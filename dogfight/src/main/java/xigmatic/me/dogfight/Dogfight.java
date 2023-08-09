@@ -21,9 +21,7 @@ public final class Dogfight extends JavaPlugin {
         ScoreManager scoreManager;
         try {
             scoreManager = new ScoreManager();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (ParseException e) {
+        } catch (IOException | ParseException e) {
             throw new RuntimeException(e);
         }
         this.getCommand("getScore").setExecutor(scoreManager);
