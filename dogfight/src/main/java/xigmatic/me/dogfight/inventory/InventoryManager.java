@@ -9,20 +9,22 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDropItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryView;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
-import xigmatic.me.dogfight.RoleManager;
+import xigmatic.me.dogfight.GameState;
+import xigmatic.me.dogfight.scoreboard.RoleManager;
 
 public class InventoryManager implements CommandExecutor, Listener {
     private Plugin plugin;
     private RoleManager roleManager;
+    private GameState gameState;
     /**
      * Creates a new InventoryManager
      * @param plugin Pass through main Plugin class
@@ -34,9 +36,18 @@ public class InventoryManager implements CommandExecutor, Listener {
 
 
     /**
+     * Sets the GameState associated with InventoryManager (Meant to create parity between GameManager and InventoryManager)
+     * @param newGameState New GameState that InventoryManager reads
+     */
+    public void setGameState(GameState newGameState) {
+        this.gameState = newGameState;
+    }
+
+
+    /**
      * Initializes and opens the selection screen for "Glider" or "Sniper"
      */
-    private void openInventory(Player player) {
+    private void openSelectionScreen(Player player) {
         // Initializes hopper inventory (selection screen)
         Inventory selectionScreen = Bukkit.createInventory(player, InventoryType.HOPPER," ");
 
@@ -44,6 +55,7 @@ public class InventoryManager implements CommandExecutor, Listener {
         ItemStack sniper = new ItemStack(Material.CROSSBOW);
         sniper.addUnsafeEnchantment(Enchantment.QUICK_CHARGE, 5);
         ItemMeta sniperMeta = sniper.getItemMeta();
+        sniperMeta.removeItemFlags(ItemFlag.HIDE_ENCHANTS);
 
 
         // "Sniper" item selection button
@@ -67,7 +79,7 @@ public class InventoryManager implements CommandExecutor, Listener {
         Player p = (Player) event.getWhoClicked();
 
         // Checks if an item was clicked or the inventory type is "hopper"
-        if (event.getCurrentItem().getType() == Material.AIR)
+        if (event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR)
             return;
 
         // Checks if the inventory type is "hopper" and will cancel the inventory move event but not execute any selection code
@@ -100,6 +112,9 @@ public class InventoryManager implements CommandExecutor, Listener {
         } else if (event.getCurrentItem().getType() == Material.ELYTRA) {
             roleManager.setGlider(p);
         }
+
+        // Clears inventory to prevent inventory from reopening (More explanation in "onInventoryClick")
+        event.getInventory().clear();
     }
 
 
@@ -116,6 +131,32 @@ public class InventoryManager implements CommandExecutor, Listener {
 
 
     /**
+     * Checks if an inventory is closed and cancels if the inventory is the selection screen
+     * @param event Event
+     */
+    @EventHandler
+    public void onInventoryClose(InventoryCloseEvent event) {
+        // Prevents Inventory from opening again if the following conditions are met
+        // The current gameState is NOT SELECTING1 or SELECTING2
+        if(!(this.gameState == GameState.SELECTING1 || this.gameState == GameState.SELECTING2)
+                // Inventory type is NOT hopper
+                || event.getInventory().getType() != InventoryType.HOPPER
+                // Inventory is empty (this identifies if something has already been clicked)
+                || event.getInventory().isEmpty())
+            return;
+
+        // Necessary Variables
+        Player player = (Player) event.getPlayer();
+        Inventory closedInventory = event.getInventory();
+
+        // Reopens inventory
+        Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, () -> {
+            player.openInventory(closedInventory);
+        }, 1);
+    }
+
+
+    /**
      * Listens for certain commands
      * @param sender Entity/console where the command was issued
      * @param command Command object (not really important)
@@ -128,7 +169,7 @@ public class InventoryManager implements CommandExecutor, Listener {
         // openTestInv
         if(label.equalsIgnoreCase("openTestInv")) {
             Player p = (Player) sender;
-            openInventory(p);
+            openSelectionScreen(p);
 
             return true;
         }
@@ -136,6 +177,8 @@ public class InventoryManager implements CommandExecutor, Listener {
         // giveEquipment
         if(label.equalsIgnoreCase("giveEquipment")) {
             roleManager.distributeEquipment();
+
+            return true;
         }
 
         return false;
