@@ -15,5 +15,3 @@ commands:
     description: Manually gives equipment to all players depending on what role they currently are
   testRider:
     description: Tests elytra ride with Xigmatic and Aristratus
-  getScore:
-    description: Gets the score of the given player

@@ -1,4 +1,4 @@
-package xigmatic.me.dogfight.scoreboard;
+package xigmatic.me.dogfight;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
+import javax.management.relation.Role;
 import java.util.HashMap;
 
 public class RoleManager {

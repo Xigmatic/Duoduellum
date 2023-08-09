@@ -5,10 +5,13 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import xigmatic.me.dogfight.inventory.InventoryManager;
-import xigmatic.me.dogfight.scoreboard.RoleManager;
 import xigmatic.me.dogfight.tasks.CountdownTask;
 import xigmatic.me.dogfight.tasks.DisplayCountdownTask;
+
+import javax.management.relation.Role;
 
 public class GameManager implements CommandExecutor {
     private GameState gameState;
@@ -22,10 +25,7 @@ public class GameManager implements CommandExecutor {
         this.plugin = plugin;
         this.inventoryManager = inventoryManager;
         this.roleManager = roleManager;
-        this.gameState = GameState.SELECTING1;
-
-        // Pairs inventoryManager's gameState
-        this.inventoryManager.setGameState(this.gameState);
+        this.gameState = GameState.PENDING;
     }
 
 
@@ -158,9 +158,6 @@ public class GameManager implements CommandExecutor {
                 changeGameState(GameState.FINISH);
                 break;
         }
-
-        // Sets InventoryManager's gameState to the current one (parity)
-        this.inventoryManager.setGameState(this.gameState);
     }
 
 
