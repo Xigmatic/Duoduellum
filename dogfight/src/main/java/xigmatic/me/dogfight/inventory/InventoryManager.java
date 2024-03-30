@@ -20,10 +20,11 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import xigmatic.me.dogfight.GameState;
 import xigmatic.me.dogfight.scoreboard.RoleManager;
+import xigmatic.me.dogfight.scoreboard.TeamManager;
 
 public class InventoryManager implements CommandExecutor, Listener {
-    private Plugin plugin;
-    private RoleManager roleManager;
+    private final Plugin plugin;
+    private final RoleManager roleManager;
     private GameState gameState;
     /**
      * Creates a new InventoryManager
@@ -47,7 +48,7 @@ public class InventoryManager implements CommandExecutor, Listener {
     /**
      * Initializes and opens the selection screen for "Glider" or "Sniper"
      */
-    private void openSelectionScreen(Player player) {
+    public void openSelectionScreen(Player player) {
         // Initializes hopper inventory (selection screen)
         Inventory selectionScreen = Bukkit.createInventory(player, InventoryType.HOPPER," ");
 
@@ -97,6 +98,7 @@ public class InventoryManager implements CommandExecutor, Listener {
 
         // Beginning of selection logic
 
+
         // Cancels event
         event.setCancelled(true);
 
@@ -108,13 +110,14 @@ public class InventoryManager implements CommandExecutor, Listener {
 
         // Sets role depending on what item is clicked
         if(event.getCurrentItem().getType() == Material.CROSSBOW) {
-            roleManager.setSniper(p);
+            // Sets the player's role and the opposite player's role to the remaining role
+            roleManager.setSniper(p.getName());
+            roleManager.setGlider(TeamManager.getOtherPlayerOfTeam(p.getName()));
         } else if (event.getCurrentItem().getType() == Material.ELYTRA) {
-            roleManager.setGlider(p);
+            // Sets the player's role and the opposite player's role to the remaining role
+            roleManager.setGlider(p.getName());
+            roleManager.setSniper(TeamManager.getOtherPlayerOfTeam(p.getName()));
         }
-
-        // Clears inventory to prevent inventory from reopening (More explanation in "onInventoryClick")
-        event.getInventory().clear();
     }
 
 
@@ -141,8 +144,8 @@ public class InventoryManager implements CommandExecutor, Listener {
         if(!(this.gameState == GameState.SELECTING1 || this.gameState == GameState.SELECTING2)
                 // Inventory type is NOT hopper
                 || event.getInventory().getType() != InventoryType.HOPPER
-                // Inventory is empty (this identifies if something has already been clicked)
-                || event.getInventory().isEmpty())
+                // Player has a role (this identifies if something has already been clicked)
+                || this.roleManager.getPlayerRole(event.getPlayer().getName()) != null)
             return;
 
         // Necessary Variables

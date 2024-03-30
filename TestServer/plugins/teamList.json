@@ -1,0 +1,15 @@
+{
+	"teams": [
+		{"name": "Makers", "player1": "Xigmatic", "player2": "Aristratus", "color": "lime", "logo": "\u2460"},
+		{"name": "Goofy", "player1": "Treesco", "player2": "hopinc", "color": "purple", "logo": "\u2461"},
+		{"name": "Acoustic", "player1": "Takusuno", "player2": "tredred1273", "color": "red", "logo": "\u2462"},
+		{"name": "GFBF", "player1": "FEMIN1NE", "player2": "LegendaryFloof", "color": "light_blue", "logo": "\u2463"},
+		{"name": "Fart", "player1": "ntgovin", "player2": "DuraHeart", "color": "blue", "logo": "\u2464"},
+		{"name": "Doggy", "player1": "Dogmatic", "player2": "beh2", "color": "gray", "logo": "\u2465"},
+		{"name": "Test", "player1": "beh1", "player2": "beh2", "color": "black", "logo": "\u2466"},
+		{"name": "Test1", "player1": "beh1", "player2": "beh2", "color": "white", "logo": "\u2467"},
+		{"name": "Test2", "player1": "beh1", "player2": "beh2", "color": "orange", "logo": "\u2468"},
+		{"name": "Test3", "player1": "beh1", "player2": "beh2", "color": "cyan", "logo": "\u2469"}
+	]
+}
+	

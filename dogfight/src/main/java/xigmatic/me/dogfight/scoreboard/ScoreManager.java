@@ -1,25 +1,28 @@
 package xigmatic.me.dogfight.scoreboard;
 
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.scoreboard.*;
 import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
 import java.util.HashMap;
 
 public class ScoreManager implements CommandExecutor {
-    private HashMap<String, Integer> playerPointMap;
+    private final HashMap<String, Integer> playerPointMap;
 
     /**
      * Creates the manager that links scores and players together
      */
-    public ScoreManager() throws IOException, ParseException {
+    public ScoreManager() {
         // Initializes playerPointMap
         this.playerPointMap = new HashMap<>();
 
         // Adds all players to playerPointMap and assigns them with a score of 0
-        for(TourneyTeam team : JsonHandler.readTeamList()) {
+        for(TourneyTeam team : TeamManager.getAllTeams()) {
             this.playerPointMap.put(team.getPlayer1(), 0);
             this.playerPointMap.put(team.getPlayer2(), 0);
         }
@@ -75,7 +78,8 @@ public class ScoreManager implements CommandExecutor {
         // getScore
         if(label.equalsIgnoreCase("getScore")) {
             try {
-                sender.sendMessage(args[0] + "'s current score is " + getPoints(args[0]));
+                String playerName = args[0];
+                sender.sendMessage(TeamManager.getPlayerChatString(playerName) + "'s" + ChatColor.WHITE + " current score is " + getPoints(args[0]));
             } catch(NullPointerException e) {
                 sender.sendMessage("This player does not exist");
             } catch(ArrayIndexOutOfBoundsException e) {

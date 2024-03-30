@@ -1,5 +1,11 @@
 [
   {
+    "uuid": "bd41e488-c92f-3d8c-980f-1ee426077c1a",
+    "name": "Dogmatic",
+    "level": 4,
+    "bypassesPlayerLimit": false
+  },
+  {
     "uuid": "10f9e327-d417-3ecc-8a99-2f16a3d17bcc",
     "name": "Xigmatic",
     "level": 4,

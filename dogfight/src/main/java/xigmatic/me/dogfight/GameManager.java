@@ -1,28 +1,45 @@
 package xigmatic.me.dogfight;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.plugin.Plugin;
+import org.json.simple.parser.ParseException;
+import xigmatic.me.dogfight.camera.CameraFunctions;
 import xigmatic.me.dogfight.inventory.InventoryManager;
-import xigmatic.me.dogfight.scoreboard.RoleManager;
+import xigmatic.me.dogfight.scoreboard.*;
 import xigmatic.me.dogfight.tasks.CountdownTask;
 import xigmatic.me.dogfight.tasks.DisplayCountdownTask;
+import xigmatic.me.dogfight.tasks.SelectingTask;
+import xigmatic.me.dogfight.tasks.gameplay.PlayerLifeManager;
+import xigmatic.me.dogfight.tasks.gameplay.RoundOneTask;
+
+import java.io.IOException;
 
 public class GameManager implements CommandExecutor {
     private GameState gameState;
-    private Plugin plugin;
-    private InventoryManager inventoryManager;
-    private RoleManager roleManager;
+    private final Plugin plugin;
+    private final ScoreManager scoreManager;
+    private final InventoryManager inventoryManager;
+    private final RoleManager roleManager;
+    private CountdownTask currentTask;
+    private final PlayerLifeManager playerLifeManager;
+
     /**
      * Creates new GameManager (Not singleton)
+     * Game State is set to PENDING by default
      */
-    public GameManager(Dogfight plugin, InventoryManager inventoryManager, RoleManager roleManager) {
+    public GameManager(Dogfight plugin, ScoreManager scoreManager, InventoryManager inventoryManager, RoleManager roleManager, PlayerLifeManager playerLifeManager) {
         this.plugin = plugin;
+        this.scoreManager = scoreManager;
         this.inventoryManager = inventoryManager;
         this.roleManager = roleManager;
-        this.gameState = GameState.SELECTING1;
+        this.gameState = GameState.PENDING;
+        this.playerLifeManager = playerLifeManager;
 
         // Pairs inventoryManager's gameState
         this.inventoryManager.setGameState(this.gameState);
@@ -33,85 +50,114 @@ public class GameManager implements CommandExecutor {
      * Tests timing between events (Timer is displayed on actionbar to check accurate timing)
      */
     private void testSchedule() {
-        nextGameState();
+        this.gameState = GameState.PENDING;
+        this.nextGameState();
     }
 
 
     /**
-     * Pauses current schedule by cancelling the current task
+     * Pauses current schedule by stopping time in the current task
+     * @return Returns if any task was paused (null task returns false)
      */
     private boolean pauseSchedule() {
-        if(currentTask != null && this.currentTask.pause()) {
-            return true;
-        }
-        return false;
+        return currentTask != null && this.currentTask.pause();
     }
 
 
     /**
-     *
+     * Resumes current schedule by resuming time in the current task
+     * @return Returns if any task was resumed (null task returns false)
      */
     private boolean resumeSchedule() {
-        if(currentTask != null && this.currentTask.resume()) {
-            return true;
-        }
-        return false;
+        return currentTask != null && this.currentTask.resume();
     }
 
 
     /**
-     * Changes gameState variable
-     * @param newGameState New game section to transition to
+     * Changes gameState variable (DOES NOT RUN TRANSITION CODE)
+     * @param newGameState New game section to be changed to
      */
     private void changeGameState(GameState newGameState) {
         this.gameState = newGameState;
     }
 
 
-    private CountdownTask currentTask;
     /**
      * Sets the current task running as well as the current runnable being run
-     * @param runnable This will be run every in-game tick
+     * WILL CANCEL ANY TASK CURRENTLY RUNNING
+     * @param runnable Segment of code that will run AFTER the countdown has completed
      */
     private void setTask(CountdownTask runnable) {
+        if(this.currentTask != null && !this.currentTask.isCancelled()) this.currentTask.kill();
+
         this.currentTask = runnable;
         runnable.start();
     }
 
 
     /**
-     * Changes gameState to the next sequential state (found in GameState enum) and executes necessary actions when changing states
+     * Advances gameState to the next sequential state (found in GameState enum) and executes the necessary actions defined by each state
      */
     private void nextGameState() {
         switch(gameState) {
             default:
                 break;
             case PENDING:
-                // WAITING1 Timer
+                // WAITING1 timer and transition event
                 setTask(new CountdownTask(() -> {
-                    Bukkit.getPlayer("Xigmatic").sendMessage("erm");
-                    nextGameState();
+                    Bukkit.getConsoleSender().sendMessage("erm");
+
+                    // Moves to next state after completion
+                    this.nextGameState();
                 },5));
 
                 changeGameState(GameState.WAITING1);
                 break;
             case WAITING1:
-                // SELECTING1 Timer
-                setTask(new DisplayCountdownTask(() -> {
-                    Bukkit.getPlayer("Xigmatic").sendMessage("erm");
-                },10));
+                // SELECTING1 timer and transition event
+                setTask(new SelectingTask(() -> {
+                    Bukkit.broadcastMessage("Done selecting");
+
+                    // Moves to next state after completion
+                    this.nextGameState();
+                }, 20, inventoryManager));
+
+                // Opens inventory on the first tick of the countdown for all PLAYER ONES
+                for(Player player : TeamManager.getAllPlayer1AsEntity()) {
+                    inventoryManager.openSelectionScreen(player);
+                }
 
                 changeGameState(GameState.SELECTING1);
                 break;
             case SELECTING1:
-
-
-
+                // PREROUND1 timer and transition event
                 changeGameState(GameState.PREROUND1);
+
+                // Fills all empty roles for players
+                this.roleManager.autofillRoles();
+
+                // Closes all hopper inventories
+                for(Player player : TeamManager.getAllPlayer1AsEntity()) {
+                    if(player.getOpenInventory().getType() == InventoryType.HOPPER) {
+                        player.closeInventory();
+                    }
+                }
+
+                // Gives all players necessary equipment
+                this.roleManager.distributeEquipment();
+
+                // Moves to next state after completion
+                this.nextGameState();
                 break;
             case PREROUND1:
+                // ROUND1 timer and transition event
+                setTask(new RoundOneTask(() -> {
+                    // Moves to next state after completion
+                    //this.nextGameState();
+                }, 30, new Player[] {Bukkit.getPlayer("Xigmatic")} ));
 
-
+                // Sets all player's health
+                this.playerLifeManager.setPlayerHealth();
 
                 changeGameState(GameState.ROUND1);
                 break;
@@ -159,7 +205,7 @@ public class GameManager implements CommandExecutor {
                 break;
         }
 
-        // Sets InventoryManager's gameState to the current one (parity)
+        // Sets InventoryManager's gameState to the current one (NECESSARY FOR PARITY)
         this.inventoryManager.setGameState(this.gameState);
     }
 
