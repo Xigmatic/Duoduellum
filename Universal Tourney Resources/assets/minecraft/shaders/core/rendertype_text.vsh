@@ -19,28 +19,34 @@ out vec4 vertexColor;
 out vec2 texCoord0;
 
 void main() {
-    // vanilla behavior
     gl_Position = ProjMat * ModelViewMat * vec4(Position, 1.0);
+
     vertexDistance = fog_distance(ModelViewMat, IViewRotMat * Position, FogShape);
     vertexColor = Color * texelFetch(Sampler2, UV2 / 16, 0);
     texCoord0 = UV0;
-    // NoShadow behavior (https://github.com/PuckiSilver/NoShadow)
-    ivec3 iColor = ivec3(Color.xyz * 255 + vec3(0.5));
-    if (iColor == ivec3(78, 92, 36) && (
-        Position.z == 0.03 || // Actionbar
-        Position.z == 0.06 || // Subtitle
-        Position.z == 0.12 || // Title
-        Position.z == 100.03 || // Chat
-        Position.z == 200.03 || // Advancement Screen
-        Position.z == 400.03    // Items
-        )) { // Regular text
-        vertexColor.rgb = texelFetch(Sampler2, UV2 / 16, 0).rgb; // Remove color from no shadow marker
-    } else if (iColor == ivec3(19, 23, 9) && (
-        Position.z == 0 || // Actionbar | Subtitle | Title
-        Position.z == 100 || // Chat
-        Position.z == 200 || // Advancement Screen
-        Position.z == 400    // Items
-        )) { // Shadow
-        gl_Position = vec4(2,2,2,1); // Move shadow off screen
+
+    // Removes color from no-shadow text
+    if(Color == vec4(227/255.0, 255/255.0, 234/255.0, Color.a) && (
+        Position.z == 0.03 ||
+        Position.z == 100.03 ||
+        Position.z == 200.03 ||
+        Position.z == 300.03 ||
+        Position.z == 400.03
+    )) {
+        vertexColor = texelFetch(Sampler2, UV2 / 16, 0);
+    
+    // Removes shadow by removing pixels with a darker color of the no-shad0w color
+    } else if((Color == vec4(56/255.0, 63/255.0, 58/255.0, Color.a)) && (
+        Position.z == 0 ||
+        Position.z == 100 ||
+        Position.z == 200 ||
+        Position.z == 300 ||
+        Position.z == 400
+    )) {
+        vertexColor.a = 0.0;
+    // Transparent (GRAY DEFAULT TEXT COLOR)
+    } else if((Color == vec4(170/255.0, 170/255.0, 170/255.0, Color.a) &&
+        Position.z == 0.03 && Position.y < 300.0) || (Color == vec4(42/255.0, 42/255.0, 42/255.0, Color.a) && Position.z == 0 && Position.y < 300.0)) {
+        vertexColor.a = 0.0;
     }
 }

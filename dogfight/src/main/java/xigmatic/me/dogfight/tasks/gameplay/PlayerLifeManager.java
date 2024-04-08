@@ -63,12 +63,10 @@ public class PlayerLifeManager implements Listener {
      * Sets all player's health to the max health
      */
     public void setPlayerHealth() {
-        for(TourneyTeam team : TeamManager.getAllTeams()) {
+        for(Player player : TeamManager.getAllPlayersAsEntity()) {
             // Sets every player's health to the max number of hearts
-            Bukkit.getPlayer(team.getPlayer1()).setHealthScale(maxHealth * 2.0);
-            Bukkit.getPlayer(team.getPlayer1()).setHealth(20.0);
-            Bukkit.getPlayer(team.getPlayer2()).setHealthScale(maxHealth * 2.0);
-            Bukkit.getPlayer(team.getPlayer2()).setHealth(20.0);
+            player.setHealthScale(maxHealth * 2.0);
+            player.setHealth(20.0);
         }
     }
 

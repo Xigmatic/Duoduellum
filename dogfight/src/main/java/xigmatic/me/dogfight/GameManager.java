@@ -19,6 +19,7 @@ import xigmatic.me.dogfight.tasks.gameplay.PlayerLifeManager;
 import xigmatic.me.dogfight.tasks.gameplay.RoundOneTask;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class GameManager implements CommandExecutor {
     private GameState gameState;
@@ -146,6 +147,9 @@ public class GameManager implements CommandExecutor {
                 // Gives all players necessary equipment
                 this.roleManager.distributeEquipment();
 
+                // Mounts one teammate to another
+                this.roleManager.mountPlayerToPlayer();
+
                 // Moves to next state after completion
                 this.nextGameState();
                 break;
@@ -154,7 +158,7 @@ public class GameManager implements CommandExecutor {
                 setTask(new RoundOneTask(() -> {
                     // Moves to next state after completion
                     //this.nextGameState();
-                }, 30, new Player[] {Bukkit.getPlayer("Xigmatic")} ));
+                }, 30, new ArrayList<>(Bukkit.getOnlinePlayers())));
 
                 // Sets all player's health
                 this.playerLifeManager.setPlayerHealth();

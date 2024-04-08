@@ -3,7 +3,7 @@ package xigmatic.me.dogfight.scoreboard;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
@@ -11,6 +11,7 @@ import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class RoleManager {
     private final Plugin plugin;
@@ -67,29 +68,6 @@ public class RoleManager {
                roleMap.replace(team.getPlayer1(), DogfightRole.SNIPER);
            if(roleMap.get(team.getPlayer2()) == null)
                roleMap.replace(team.getPlayer2(), DogfightRole.GLIDER);
-
-           try {
-               // Player 1 Display Name Change
-               if (roleMap.get(team.getPlayer1()) == DogfightRole.SNIPER) {
-                   Bukkit.getPlayer(team.getPlayer1()).setDisplayName(team.getPlayer1() + "[S]");
-                   Bukkit.getPlayer(team.getPlayer1()).setPlayerListName(team.getPlayer1() + "[S]");
-               } else {
-                   Bukkit.getPlayer(team.getPlayer1()).setDisplayName(team.getPlayer1() + "[G]");
-                   Bukkit.getPlayer(team.getPlayer1()).setPlayerListName(team.getPlayer1() + "[G]");
-               }
-           } catch (Exception ignored) {}
-
-           try {
-               // Player 1 Display Name Change
-               if (roleMap.get(team.getPlayer2()) == DogfightRole.SNIPER) {
-                   Bukkit.getPlayer(team.getPlayer2()).setDisplayName(team.getPlayer2() + "[S]");
-                   Bukkit.getPlayer(team.getPlayer2()).setPlayerListName(team.getPlayer2() + "[S]");
-               } else {
-                   Bukkit.getPlayer(team.getPlayer2()).setDisplayName(team.getPlayer2() + "[G]");
-                   Bukkit.getPlayer(team.getPlayer2()).setPlayerListName(team.getPlayer2() + "[G]");
-               }
-           } catch (Exception ignored) {}
-
        }
     }
 
@@ -125,10 +103,33 @@ public class RoleManager {
      */
     public void distributeEquipment() {
         for(String playerName : roleMap.keySet()) {
-            if(roleMap.get(playerName) == DogfightRole.SNIPER) {
-                giveSniper(Bukkit.getPlayer(playerName));
-            } else {
-                giveGlider(Bukkit.getPlayer(playerName));
+            try {
+                if (roleMap.get(playerName) == DogfightRole.SNIPER) {
+                    // Cannot be null
+                    giveSniper(Bukkit.getPlayer(playerName));
+                } else {
+                    // Cannot be null
+                    giveGlider(Bukkit.getPlayer(playerName));
+                }
+            } catch (Exception ignored) {
+                Bukkit.getConsoleSender().sendMessage("Could not give equipment to " + playerName + " because they are not online");
+            }
+        }
+    }
+
+
+    public void mountPlayerToPlayer() {
+        for(String playerName : roleMap.keySet()) {
+            try {
+                if (roleMap.get(playerName) == DogfightRole.GLIDER) {
+                    Entity sniperSeat = Bukkit.getPlayer(playerName).getWorld().spawnEntity(Bukkit.getPlayer(playerName).getLocation(), EntityType.BEE);
+                    sniperSeat.setSilent(true);
+                    ((LivingEntity) sniperSeat).setInvisible(true);
+                    sniperSeat.addPassenger(Bukkit.getPlayer(TeamManager.getOtherPlayerOfTeam(playerName)));
+                    Bukkit.getPlayer(playerName).addPassenger(sniperSeat);
+                }
+            } catch(Exception ignored) {
+                Bukkit.getConsoleSender().sendMessage("Could not mount " + TeamManager.getOtherPlayerOfTeam(playerName) + " because either they or " + playerName + " are not online");
             }
         }
     }

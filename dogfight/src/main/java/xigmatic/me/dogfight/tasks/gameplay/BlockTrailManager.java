@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class BlockTrailManager {
-    private Player[] players;
+    private ArrayList<Player> players;
     final private HashMap<Player, ArrayList<Location>> previousPlayerLocationMap = new HashMap<>();
     private int locationListLength;
     private int ticksLeft;
@@ -24,7 +24,7 @@ public class BlockTrailManager {
      * Creates a block trail manager necessary for gameplay
      * @param players List of players to apply the Block Trail to
      */
-    public BlockTrailManager(Player[] players) {
+    public BlockTrailManager(ArrayList<Player> players) {
         this.players = players;
         for(Player player : players) {
             this.previousPlayerLocationMap.put(player, new ArrayList<>());

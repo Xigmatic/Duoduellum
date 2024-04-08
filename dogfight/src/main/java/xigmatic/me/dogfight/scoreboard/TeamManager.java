@@ -1,16 +1,12 @@
 package xigmatic.me.dogfight.scoreboard;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.chat.TextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Team;
 import org.json.simple.parser.ParseException;
-import xigmatic.me.dogfight.ChatManager;
+import xigmatic.me.dogfight.text.ChatManager;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -246,10 +242,17 @@ public class TeamManager {
 
     /**
      * Returns team prefix and player name if for whatever reason it doesn't work any other way
+     * STRICTLY USED FOR CHAT ONLY
      * @param playerName Player name to be converted
      * @return Full player chat text
      */
     public static String getChatNameCombo(String playerName) {
-        return getTeamPrefix(playerName) + playerName;
+        return getTeamPrefix(playerName) + getPlayerChatColor(playerName) + playerName;
+    }
+
+
+    public static void deleteAllTeams() {
+        for(Team team : Bukkit.getServer().getScoreboardManager().getMainScoreboard().getTeams())
+            team.getScoreboard();
     }
 }

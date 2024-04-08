@@ -1,6 +1,7 @@
 package xigmatic.me.dogfight.inventory;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -50,7 +51,7 @@ public class InventoryManager implements CommandExecutor, Listener {
      */
     public void openSelectionScreen(Player player) {
         // Initializes hopper inventory (selection screen)
-        Inventory selectionScreen = Bukkit.createInventory(player, InventoryType.HOPPER," ");
+        Inventory selectionScreen = Bukkit.createInventory(player, InventoryType.HOPPER, ChatColor.WHITE + "⓿⓿⓿⓿⓿⓿⓿⓿Ⓘ");
 
         // "Sniper" item selection button
         ItemStack sniper = new ItemStack(Material.CROSSBOW);
@@ -77,7 +78,7 @@ public class InventoryManager implements CommandExecutor, Listener {
      */
     @EventHandler
     public void onClick(InventoryClickEvent event) {
-        Player p = (Player) event.getWhoClicked();
+        Player player = (Player) event.getWhoClicked();
 
         // Checks if an item was clicked or the inventory type is "hopper"
         if (event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR)
@@ -90,8 +91,8 @@ public class InventoryManager implements CommandExecutor, Listener {
 
             // Refreshes inventory after 2 ticks
             Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
-                p.updateInventory();
-                p.closeInventory();
+                player.updateInventory();
+                player.closeInventory();
             }, 2);
             return;
         }
@@ -104,19 +105,19 @@ public class InventoryManager implements CommandExecutor, Listener {
 
         // Refreshes inventory after 2 ticks
         Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
-            p.updateInventory();
-            p.closeInventory();
+            player.updateInventory();
+            player.closeInventory();
         }, 2);
 
         // Sets role depending on what item is clicked
         if(event.getCurrentItem().getType() == Material.CROSSBOW) {
             // Sets the player's role and the opposite player's role to the remaining role
-            roleManager.setSniper(p.getName());
-            roleManager.setGlider(TeamManager.getOtherPlayerOfTeam(p.getName()));
+            roleManager.setSniper(player.getName());
+            roleManager.setGlider(TeamManager.getOtherPlayerOfTeam(player.getName()));
         } else if (event.getCurrentItem().getType() == Material.ELYTRA) {
             // Sets the player's role and the opposite player's role to the remaining role
-            roleManager.setGlider(p.getName());
-            roleManager.setSniper(TeamManager.getOtherPlayerOfTeam(p.getName()));
+            roleManager.setGlider(player.getName());
+            roleManager.setSniper(TeamManager.getOtherPlayerOfTeam(player.getName()));
         }
     }
 

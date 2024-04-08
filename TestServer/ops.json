@@ -1,5 +1,17 @@
 [
   {
+    "uuid": "51592e82-1687-4ad9-85c4-23579c8d87ee",
+    "name": "DuraHeart",
+    "level": 4,
+    "bypassesPlayerLimit": false
+  },
+  {
+    "uuid": "fa8153f7-f016-4077-bad5-8d4808170986",
+    "name": "Xigmatic",
+    "level": 4,
+    "bypassesPlayerLimit": false
+  },
+  {
     "uuid": "bd41e488-c92f-3d8c-980f-1ee426077c1a",
     "name": "Dogmatic",
     "level": 4,

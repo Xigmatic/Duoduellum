@@ -3,9 +3,8 @@ package xigmatic.me.dogfight.scoreboard;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
-import org.bukkit.craftbukkit.v1_20_R1.util.CraftChatMessage;
 import org.bukkit.scoreboard.Team;
-import xigmatic.me.dogfight.ChatManager;
+import xigmatic.me.dogfight.text.ChatManager;
 
 import java.util.UUID;
 
@@ -108,18 +107,44 @@ public class TourneyTeam {
 
         // Removes any existing team with the passed team name to prepare for creating a new one
         try {
-            Bukkit.getScoreboardManager().getMainScoreboard().getTeam(teamName).unregister();
+            Bukkit.getScoreboardManager().getMainScoreboard().getTeam(teamName.substring(0,teamName.length()) + "c").unregister();
         } catch(Exception ignore) {
             // Confirms that no team had the team name
-            Bukkit.getConsoleSender().sendMessage("No scoreboard team conflict with " + teamName);
+            Bukkit.getConsoleSender().sendMessage("No scoreboard team conflict with " + teamName + "c");
+        }
+        try {
+            Bukkit.getScoreboardManager().getMainScoreboard().getTeam(teamName + "b").unregister();
+        } catch(Exception ignore) {
+            // Confirms that no team had the team name
+            Bukkit.getConsoleSender().sendMessage("No scoreboard team conflict with " + teamName + "b");
+        }
+        try {
+            Bukkit.getScoreboardManager().getMainScoreboard().getTeam(teamName.substring(0,teamName.length()) + "a").unregister();
+        } catch(Exception ignore) {
+            // Confirms that no team had the team name
+            Bukkit.getConsoleSender().sendMessage("No scoreboard team conflict with " + teamName + "a");
         }
 
+
+
         // Creates a team on the in-game scoreboard (ONLY FOR COLORS)
-        this.scoreboardTeam = Bukkit.getScoreboardManager().getMainScoreboard().registerNewTeam(teamName);
-        this.scoreboardTeam.setColor(ChatColor.WHITE);
-        this.scoreboardTeam.setPrefix(this.chatColor + "●" + " " + ChatColor.WHITE + this.logoChar + " ");
+        this.scoreboardTeam = Bukkit.getScoreboardManager().getMainScoreboard().registerNewTeam(teamName + "c");
+        this.scoreboardTeam.setColor(chatColor);
+        this.scoreboardTeam.setPrefix(this.chatColor + "●" + ChatColor.WHITE + " ");
         this.scoreboardTeam.addEntry(player1);
         this.scoreboardTeam.addEntry(player2);
+
+        // Creates Tab-list team entry that displays the team name only
+        Team tablistTeamName = Bukkit.getScoreboardManager().getMainScoreboard().registerNewTeam(teamName + "b");
+        tablistTeamName.setColor(ChatColor.GRAY);
+        tablistTeamName.setPrefix("⑿" + ChatColor.WHITE + ChatColor.ITALIC + ChatColor.BOLD + teamName);
+        tablistTeamName.addEntry(teamName);
+
+        // Creates Tab-list team entry that diplays the logo only
+        Team tablistTeamLogo = Bukkit.getScoreboardManager().getMainScoreboard().registerNewTeam(teamName + "a");
+        tablistTeamLogo.setColor(ChatColor.GRAY);
+        tablistTeamLogo.setPrefix(ChatColor.WHITE + "⓿⓿⓿⓿⓿⓿⓿⓿⓿" + logoChar);
+        tablistTeamLogo.addEntry("_" + teamName);
 
         // Sets the player's chat name to the formatted one (dot logo name)
         //Bukkit.getPlayer(player1).
@@ -186,6 +211,25 @@ public class TourneyTeam {
      */
     public String getTeamPrefix() {
         return this.scoreboardTeam.getPrefix();
+    }
+
+
+    /**
+     * Returns a boolean value stating if player 1 is online
+     * @return If player 1 is online
+     */
+    public boolean isPlayer1Online() {
+        return Bukkit.getPlayer(this.p1) != null;
+    }
+
+
+    /**
+     * Returns a boolean value stating if player 2 is online
+     * @return If player 2 is online
+     */
+    public boolean isPlayer2Online() {
+
+        return Bukkit.getPlayer(this.p2) != null;
     }
 
 

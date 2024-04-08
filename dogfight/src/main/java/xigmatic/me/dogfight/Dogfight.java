@@ -1,18 +1,18 @@
 package xigmatic.me.dogfight;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.ScoreboardManager;
-import org.json.simple.parser.ParseException;
-import xigmatic.me.dogfight.camera.CameraFunctions;
+import org.checkerframework.checker.units.qual.C;
+import xigmatic.me.dogfight.connection.ConnectionHandler;
+import xigmatic.me.dogfight.connection.DisconnectionHandler;
 import xigmatic.me.dogfight.inventory.InventoryManager;
 import xigmatic.me.dogfight.scoreboard.*;
 import xigmatic.me.dogfight.tasks.gameplay.PlayerLifeManager;
+import xigmatic.me.dogfight.text.ChatManager;
+import xigmatic.me.dogfight.text.TextFunctions;
 
-import java.io.IOException;
+import java.util.ArrayList;
 
 public final class Dogfight extends JavaPlugin {
 
@@ -20,6 +20,9 @@ public final class Dogfight extends JavaPlugin {
     public void onEnable() {
         // Startup Message
         Bukkit.getConsoleSender().sendMessage("DOGFIGHT PLUGIN IS NOW ENABLED");
+
+        // Removes all teams to be reset
+        TeamManager.deleteAllTeams();
 
         // ScoreManager Setup
         ScoreManager scoreManager;
@@ -73,6 +76,12 @@ public final class Dogfight extends JavaPlugin {
         ChatManager chatManager = new ChatManager();
         getServer().getPluginManager().registerEvents(chatManager, this);
 
+        // Connection Handlers Setup
+        ConnectionHandler connectionHandler = new ConnectionHandler();
+        getServer().getPluginManager().registerEvents(connectionHandler, this);
+        DisconnectionHandler disconnectionHandler = new DisconnectionHandler();
+        getServer().getPluginManager().registerEvents(disconnectionHandler, this);
+
 
         // Prints the working directory (where server root directory of plugin is found)
         Bukkit.getConsoleSender().sendMessage("CURRENTLY RUNNING IN --> " + System.getProperty("user.dir"));
@@ -85,10 +94,9 @@ public final class Dogfight extends JavaPlugin {
                 50, 0, 90, true, 0, -30, 0 ,0, 20);
         */
 
-        // Tests tablist update
-        for(Player player : Bukkit.getOnlinePlayers())
-            ChatManager.updateTablist(player);
 
+        // Initializes all TAB-LIST NAMES before anyone may join
+        NPCManager.addTablistNPCs();
     }
 
     @Override

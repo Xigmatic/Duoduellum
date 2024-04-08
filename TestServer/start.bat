@@ -1,1 +1,1 @@
-java -Xmx4G -Xms1G -jar server.jar nogui
+java -Xmx4G -Xms1G -jar spigot-1.20.1.jar nogui

@@ -6,17 +6,18 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class DisplayCountdownTask extends CountdownTask {
-    private final Player[] players;
+    private final ArrayList<Player> players;
 
     /**
      * @param action Segment of code that will run after the countdown has finished
      * @param duration Length of time the until the runnable is executed in seconds
      * @param players List of players to show the countdown timer to on their actionbar
      */
-    public DisplayCountdownTask(Runnable action, int duration, Player[] players) {
+    public DisplayCountdownTask(Runnable action, int duration, ArrayList<Player> players) {
         super(action, duration);
         this.players = players;
     }

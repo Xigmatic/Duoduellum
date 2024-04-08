@@ -3,6 +3,8 @@ package xigmatic.me.dogfight.tasks.gameplay;
 import org.bukkit.entity.Player;
 import xigmatic.me.dogfight.tasks.DisplayCountdownTask;
 
+import java.util.ArrayList;
+
 public class RoundOneTask extends DisplayCountdownTask {
     private int ticksUntilTrail = 10 * 20;
     private final BlockTrailManager blockTrailManager;
@@ -14,7 +16,7 @@ public class RoundOneTask extends DisplayCountdownTask {
      * @param duration Length of time the until the runnable is executed in seconds
      * @param players  List of players to show the countdown timer to on their actionbar
      */
-    public RoundOneTask(Runnable action, int duration, Player[] players) {
+    public RoundOneTask(Runnable action, int duration, ArrayList<Player> players) {
         super(action, duration, players);
         this.blockTrailManager = new BlockTrailManager(players);
     }
