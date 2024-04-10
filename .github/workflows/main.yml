@@ -16,8 +16,8 @@ jobs:
     - name: Archive Release
       uses: thedoctor0/zip-release@master
       with:
-        filename: 'Tourney Resource Pack.zip'
-        path: 'Universal Tourney Resources'
+        filename: 'Resources.zip'
+        path: "Universal Tourney Resources"
     - name: push changes to remote
       run: |
         git add -A
