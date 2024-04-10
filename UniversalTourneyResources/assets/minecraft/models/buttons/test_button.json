@@ -1,0 +1,13 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "minecraft:buttons/test_button"
+  },
+  "display": {
+    "gui": {
+      "translation": [9,0,0],
+      "scale": [2.125,1,1]
+    }
+    
+  }
+}
