@@ -1,0 +1,25 @@
+name: Create Resource Pack Archive
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: pull latest and remove old file from repo
+      run: |
+        git config --global user.name "Xigmatic"
+        git config --global user.email "tncolton1@gmail.com"
+        git config pull.rebase false
+        git pull
+        rm -f "Tourney Resource Pack.zip"
+    - name: Archive Release
+      uses: thedoctor0/zip-release@master
+      with:
+        filename: 'Tourney Resource Pack.zip'
+        path: 'Universal Tourney Resources'
+    - name: push changes to remote
+      run: |
+        git add -A
+        git commit -m "Refreshed tourney resource pack"
+        git push --force
