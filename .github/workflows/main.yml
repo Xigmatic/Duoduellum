@@ -16,7 +16,7 @@ jobs:
     - name: Archive Release
       uses: thedoctor0/zip-release@master
       with:
-        filename: 'Resources.zip'
+        filename: '../Resources.zip'
         directory: 'UniversalTourneyResources'
     - name: push changes to remote
       run: |
