@@ -12,12 +12,12 @@ jobs:
         git config --global user.email "tncolton1@gmail.com"
         git config pull.rebase false
         git pull
-        rm -f "Tourney Resource Pack.zip"
+        rm -f 'Resources.zip'
     - name: Archive Release
       uses: thedoctor0/zip-release@master
       with:
         filename: 'Resources.zip'
-        path: '"Universal Tourney Resources"'
+        path: '"UniversalTourneyResources"'
     - name: push changes to remote
       run: |
         git add -A
