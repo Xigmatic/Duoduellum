@@ -1,6 +1,7 @@
 package xigmatic.me.dogfight.inventory;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -20,10 +21,11 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import xigmatic.me.dogfight.GameState;
 import xigmatic.me.dogfight.scoreboard.RoleManager;
+import xigmatic.me.dogfight.scoreboard.TeamManager;
 
 public class InventoryManager implements CommandExecutor, Listener {
-    private Plugin plugin;
-    private RoleManager roleManager;
+    private final Plugin plugin;
+    private final RoleManager roleManager;
     private GameState gameState;
     /**
      * Creates a new InventoryManager
@@ -47,9 +49,9 @@ public class InventoryManager implements CommandExecutor, Listener {
     /**
      * Initializes and opens the selection screen for "Glider" or "Sniper"
      */
-    private void openSelectionScreen(Player player) {
+    public void openSelectionScreen(Player player) {
         // Initializes hopper inventory (selection screen)
-        Inventory selectionScreen = Bukkit.createInventory(player, InventoryType.HOPPER," ");
+        Inventory selectionScreen = Bukkit.createInventory(player, InventoryType.HOPPER, ChatColor.WHITE + "⓿⓿⓿⓿⓿⓿⓿⓿Ⓘ");
 
         // "Sniper" item selection button
         ItemStack sniper = new ItemStack(Material.CROSSBOW);
@@ -76,7 +78,7 @@ public class InventoryManager implements CommandExecutor, Listener {
      */
     @EventHandler
     public void onClick(InventoryClickEvent event) {
-        Player p = (Player) event.getWhoClicked();
+        Player player = (Player) event.getWhoClicked();
 
         // Checks if an item was clicked or the inventory type is "hopper"
         if (event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR)
@@ -89,32 +91,34 @@ public class InventoryManager implements CommandExecutor, Listener {
 
             // Refreshes inventory after 2 ticks
             Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
-                p.updateInventory();
-                p.closeInventory();
+                player.updateInventory();
+                player.closeInventory();
             }, 2);
             return;
         }
 
         // Beginning of selection logic
 
+
         // Cancels event
         event.setCancelled(true);
 
         // Refreshes inventory after 2 ticks
         Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
-            p.updateInventory();
-            p.closeInventory();
+            player.updateInventory();
+            player.closeInventory();
         }, 2);
 
         // Sets role depending on what item is clicked
         if(event.getCurrentItem().getType() == Material.CROSSBOW) {
-            roleManager.setSniper(p);
+            // Sets the player's role and the opposite player's role to the remaining role
+            roleManager.setSniper(player.getName());
+            roleManager.setGlider(TeamManager.getOtherPlayerOfTeam(player.getName()));
         } else if (event.getCurrentItem().getType() == Material.ELYTRA) {
-            roleManager.setGlider(p);
+            // Sets the player's role and the opposite player's role to the remaining role
+            roleManager.setGlider(player.getName());
+            roleManager.setSniper(TeamManager.getOtherPlayerOfTeam(player.getName()));
         }
-
-        // Clears inventory to prevent inventory from reopening (More explanation in "onInventoryClick")
-        event.getInventory().clear();
     }
 
 
@@ -141,8 +145,8 @@ public class InventoryManager implements CommandExecutor, Listener {
         if(!(this.gameState == GameState.SELECTING1 || this.gameState == GameState.SELECTING2)
                 // Inventory type is NOT hopper
                 || event.getInventory().getType() != InventoryType.HOPPER
-                // Inventory is empty (this identifies if something has already been clicked)
-                || event.getInventory().isEmpty())
+                // Player has a role (this identifies if something has already been clicked)
+                || this.roleManager.getPlayerRole(event.getPlayer().getName()) != null)
             return;
 
         // Necessary Variables

@@ -17,7 +17,32 @@ public class JsonHandler {
     private FileReader fileReader;
     private JSONParser jsonParser;
     private JSONObject jsonObject;
-    private static final String teamListURL = "C:/Users/tncol/Desktop/Servers/Spigot/DuoduellumTestServer/plugins/teamList.json";
+    private static final String teamListURL = System.getProperty("user.dir") + "/plugins/teamList.json";
+
+
+    /*
+        FORMAT FOR scores.json
+        ------------------------
+        {"-Insert player1 name": __score__, "-Insert player2 name": ___, "-Insert player3 name": ___, ...}
+
+        FORMAT FOR teamList.json
+        ----------------------
+        {
+            "teams": [
+                {"name": "___", "player1": "___", "player2": "___", "color": "___", "logo": "___"},
+                {"name": "___", "player1": "___", "player2": "___", "color": "___", "logo": "___"},
+                {"name": "___", "player1": "___", "player2": "___", "color": "___", "logo": "___"},
+                {"name": "___", "player1": "___", "player2": "___", "color": "___", "logo": "___"},
+                {"name": "___", "player1": "___", "player2": "___", "color": "___", "logo": "___"},
+                {"name": "___", "player1": "___", "player2": "___", "color": "___", "logo": "___"},
+                {"name": "___", "player1": "___", "player2": "___", "color": "___", "logo": "___"},
+                {"name": "___", "player1": "___", "player2": "___", "color": "___", "logo": "___"},
+                {"name": "___", "player1": "___", "player2": "___", "color": "___", "logo": "___"},
+                {"name": "___", "player1": "___", "player2": "___", "color": "___", "logo": "___"}
+            ]
+        }
+     */
+
 
     /**
      * Creates the writer/reader necessary for distributing scores across all game servers
@@ -33,6 +58,9 @@ public class JsonHandler {
         if(!this.scoreFile.exists()) {
             this.scoreFile.createNewFile();
             Bukkit.getConsoleSender().sendMessage("Score.json DOES NOT EXIST! CREATING ONE IN " + this.scoreFile.getAbsolutePath());
+
+            // Resets newly-created file
+            resetFile();
         }
 
         // Creates temporary FileReader
@@ -70,6 +98,8 @@ public class JsonHandler {
      * Clears all text from json file
      */
     private void clearFile() {
+        if(jsonObject == null) jsonObject = new JSONObject();
+
         this.jsonObject.clear();
     }
 
@@ -77,10 +107,14 @@ public class JsonHandler {
     /**
      * Clears and reformats the score json file
      */
-    public void resetFile() {
+    public void resetFile() throws IOException, ParseException {
         clearFile();
-        //this.jsonObject.put();
 
+        // Prepares jsonObject with all players and a default score of 0
+        for(TourneyTeam team : JsonHandler.readTeamList()) {
+            this.jsonObject.put(team.getPlayer1(), 0);
+            this.jsonObject.put(team.getPlayer2(), 0);
+        }
 
         // Writes all json text to the json file and closes the writer
         try {
@@ -122,8 +156,15 @@ public class JsonHandler {
         // Creates an empty set of TourneyTeams
         TourneyTeam[] teams = new TourneyTeam[10];
 
+        // Creates file if not already present
+        File teamList = new File(teamListURL);
+        if(!teamList.exists()) {
+            teamList.createNewFile();
+            Bukkit.getConsoleSender().sendMessage("teamList.json DOES NOT EXIST! CREATING ONE IN " + teamList.getAbsolutePath());
+        }
+
         // Creates temporary fileReader
-        FileReader tempReader = new FileReader(teamListURL);
+        FileReader tempReader = new FileReader(teamList);
 
         // Creates temporary JsonObject
         JSONObject tempJsonObject = (JSONObject) new JSONParser().parse(tempReader);
@@ -132,7 +173,10 @@ public class JsonHandler {
         JSONArray teamArray = (JSONArray) tempJsonObject.get("teams");
         for(int i = 0; i < 10; i++) {
             JSONObject team = (JSONObject) teamArray.get(i);
-            teams[i] = new TourneyTeam(team.get("name").toString(), team.get("player1").toString(), team.get("player2").toString());
+            teams[i] = new TourneyTeam(team.get("name").toString(), team.get("player1").toString(), team.get("player2").toString(), team.get("color").toString(), team.get("logo").toString());
+
+            // Sends test message to confirm each team is being initialized
+            Bukkit.getConsoleSender().sendMessage(teams[i].getChatColor() + teams[i].getTeamName());
         }
 
         // Closes fileReader
@@ -153,9 +197,7 @@ public class JsonHandler {
         // Recreates jsonObject
         try {
             reparseJson();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (ParseException e) {
+        } catch (IOException | ParseException e) {
             throw new RuntimeException(e);
         }
 

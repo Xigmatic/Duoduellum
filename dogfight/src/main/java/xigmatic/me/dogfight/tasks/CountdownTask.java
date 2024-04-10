@@ -6,11 +6,11 @@ import xigmatic.me.dogfight.Dogfight;
 
 public class CountdownTask extends BukkitRunnable {
     private int timeLeft;
-    private Runnable action;
+    private final Runnable action;
     private boolean active;
     /**
-     * @param action Segment of code that is run every in-game tick
-     * @param duration Length of time the runnable will loop in seconds
+     * @param action Segment of code that will run after the countdown has finished
+     * @param duration Length of time the until the runnable is executed in seconds
      */
     public CountdownTask(Runnable action, int duration) {
         this.action = action;
@@ -58,6 +58,14 @@ public class CountdownTask extends BukkitRunnable {
             return true;
         }
         return false;
+    }
+
+
+    /**
+     * Cancels the countdown regardless of time
+     */
+    public void kill() {
+        cancel();
     }
 
 
