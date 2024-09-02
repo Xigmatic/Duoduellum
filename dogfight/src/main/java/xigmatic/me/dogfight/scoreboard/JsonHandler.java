@@ -57,7 +57,8 @@ public class JsonHandler {
         // Checks if json file exists
         if(!this.scoreFile.exists()) {
             this.scoreFile.createNewFile();
-            Bukkit.getConsoleSender().sendMessage("Score.json DOES NOT EXIST! CREATING ONE IN " + this.scoreFile.getAbsolutePath());
+            Bukkit.getConsoleSender().sendMessage("Score.json DOES NOT EXIST! CREATING ONE IN " +
+                    this.scoreFile.getAbsolutePath());
 
             // Resets newly-created file
             resetFile();
@@ -98,8 +99,10 @@ public class JsonHandler {
      * Clears all text from json file
      */
     private void clearFile() {
+        // Checks if jsonObject exists and creates a new instance if necessary
         if(jsonObject == null) jsonObject = new JSONObject();
 
+        // Clears pre-existing jsonObject
         this.jsonObject.clear();
     }
 
@@ -108,10 +111,11 @@ public class JsonHandler {
      * Clears and reformats the score json file
      */
     public void resetFile() throws IOException, ParseException {
+        // Clears current or creates a new one to prepare for reformatting
         clearFile();
 
         // Prepares jsonObject with all players and a default score of 0
-        for(TourneyTeam team : JsonHandler.readTeamList()) {
+        for(TourneyTeam team : TeamManager.getAllTeams()) {
             this.jsonObject.put(team.getPlayer1(), 0);
             this.jsonObject.put(team.getPlayer2(), 0);
         }
@@ -150,9 +154,10 @@ public class JsonHandler {
 
     /**
      * Reads the teamList json file and returns an array of teams of found in the json file
+     * CREATES ALL TOURNEY TEAMS AND DOES ALL STARTUP PROCESSES (LIKE CREATE SCOREBOARD TEAMS)
      * @return List of teams found in the json file
      */
-    public static TourneyTeam[] readTeamList() throws IOException, ParseException {
+    public static TourneyTeam[] refreshTeamList() throws IOException, ParseException {
         // Creates an empty set of TourneyTeams
         TourneyTeam[] teams = new TourneyTeam[10];
 
@@ -160,7 +165,8 @@ public class JsonHandler {
         File teamList = new File(teamListURL);
         if(!teamList.exists()) {
             teamList.createNewFile();
-            Bukkit.getConsoleSender().sendMessage("teamList.json DOES NOT EXIST! CREATING ONE IN " + teamList.getAbsolutePath());
+            Bukkit.getConsoleSender().sendMessage("teamList.json DOES NOT EXIST! CREATING ONE IN " +
+                    teamList.getAbsolutePath());
         }
 
         // Creates temporary fileReader
@@ -173,7 +179,11 @@ public class JsonHandler {
         JSONArray teamArray = (JSONArray) tempJsonObject.get("teams");
         for(int i = 0; i < 10; i++) {
             JSONObject team = (JSONObject) teamArray.get(i);
-            teams[i] = new TourneyTeam(team.get("name").toString(), team.get("player1").toString(), team.get("player2").toString(), team.get("color").toString(), team.get("logo").toString());
+
+            // Sets the index of the teams array to a new TourneyTeam instance from the data of the "team" JSON object
+            // (See formatting above for proper formatting)
+            teams[i] = new TourneyTeam(team.get("name").toString(), team.get("player1").toString(),
+                    team.get("player2").toString(), team.get("color").toString(), team.get("logo").toString());
 
             // Sends test message to confirm each team is being initialized
             Bukkit.getConsoleSender().sendMessage(teams[i].getChatColor() + teams[i].getTeamName());
@@ -182,6 +192,7 @@ public class JsonHandler {
         // Closes fileReader
         tempReader.close();
 
+        // Returns final array of newly-created TourneyTeams
         return teams;
     }
 

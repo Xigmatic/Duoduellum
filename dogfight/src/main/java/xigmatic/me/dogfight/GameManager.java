@@ -1,28 +1,25 @@
 package xigmatic.me.dogfight;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.plugin.Plugin;
-import org.json.simple.parser.ParseException;
-import xigmatic.me.dogfight.camera.CameraFunctions;
 import xigmatic.me.dogfight.inventory.InventoryManager;
-import xigmatic.me.dogfight.scoreboard.*;
+import xigmatic.me.dogfight.scoreboard.RoleManager;
+import xigmatic.me.dogfight.scoreboard.ScoreManager;
+import xigmatic.me.dogfight.scoreboard.TeamManager;
 import xigmatic.me.dogfight.tasks.CountdownTask;
-import xigmatic.me.dogfight.tasks.DisplayCountdownTask;
 import xigmatic.me.dogfight.tasks.SelectingTask;
 import xigmatic.me.dogfight.tasks.gameplay.PlayerLifeManager;
 import xigmatic.me.dogfight.tasks.gameplay.RoundOneTask;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 public class GameManager implements CommandExecutor {
-    private GameState gameState;
+    public static GameState gameState;
     private final Plugin plugin;
     private final ScoreManager scoreManager;
     private final InventoryManager inventoryManager;
@@ -34,16 +31,14 @@ public class GameManager implements CommandExecutor {
      * Creates new GameManager (Not singleton)
      * Game State is set to PENDING by default
      */
-    public GameManager(Dogfight plugin, ScoreManager scoreManager, InventoryManager inventoryManager, RoleManager roleManager, PlayerLifeManager playerLifeManager) {
+    public GameManager(Dogfight plugin, ScoreManager scoreManager, InventoryManager inventoryManager,
+                       RoleManager roleManager, PlayerLifeManager playerLifeManager) {
         this.plugin = plugin;
         this.scoreManager = scoreManager;
         this.inventoryManager = inventoryManager;
         this.roleManager = roleManager;
-        this.gameState = GameState.PENDING;
+        gameState = GameState.PENDING;
         this.playerLifeManager = playerLifeManager;
-
-        // Pairs inventoryManager's gameState
-        this.inventoryManager.setGameState(this.gameState);
     }
 
 
@@ -51,7 +46,7 @@ public class GameManager implements CommandExecutor {
      * Tests timing between events (Timer is displayed on actionbar to check accurate timing)
      */
     private void testSchedule() {
-        this.gameState = GameState.PENDING;
+        gameState = GameState.PENDING;
         this.nextGameState();
     }
 
@@ -79,7 +74,7 @@ public class GameManager implements CommandExecutor {
      * @param newGameState New game section to be changed to
      */
     private void changeGameState(GameState newGameState) {
-        this.gameState = newGameState;
+        gameState = newGameState;
     }
 
 
@@ -97,7 +92,16 @@ public class GameManager implements CommandExecutor {
 
 
     /**
-     * Advances gameState to the next sequential state (found in GameState enum) and executes the necessary actions defined by each state
+     * Returns the current game state of the GameManager
+     * @return The current GameState
+     */
+    public static GameState getGameState() {
+        return gameState;
+    }
+
+    /**
+     * Advances gameState to the next sequential state (found in GameState enum) and executes the
+     * necessary actions defined by each state
      */
     private void nextGameState() {
         switch(gameState) {
@@ -208,9 +212,6 @@ public class GameManager implements CommandExecutor {
                 changeGameState(GameState.FINISH);
                 break;
         }
-
-        // Sets InventoryManager's gameState to the current one (NECESSARY FOR PARITY)
-        this.inventoryManager.setGameState(this.gameState);
     }
 
 

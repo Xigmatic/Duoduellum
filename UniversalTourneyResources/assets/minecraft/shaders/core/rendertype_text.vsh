@@ -46,7 +46,7 @@ void main() {
         vertexColor.a = 0.0;
     // Transparent (GRAY DEFAULT TEXT COLOR)
     } else if((Color == vec4(170/255.0, 170/255.0, 170/255.0, Color.a) &&
-        Position.z == 0.03 && Position.y < 300.0) || (Color == vec4(42/255.0, 42/255.0, 42/255.0, Color.a) && Position.z == 0 && Position.y < 300.0)) {
+        Position.z == 0.03 && Position.y < 250.0) || (Color == vec4(42/255.0, 42/255.0, 42/255.0, Color.a) && Position.z == 0 && Position.y < 250.0)) {
         vertexColor.a = 0.0;
     }
 }

@@ -79,7 +79,8 @@ public class ScoreManager implements CommandExecutor {
         if(label.equalsIgnoreCase("getScore")) {
             try {
                 String playerName = args[0];
-                sender.sendMessage(TeamManager.getPlayerChatString(playerName) + "'s" + ChatColor.WHITE + " current score is " + getPoints(args[0]));
+                sender.sendMessage(TeamManager.getPlayerChatString(playerName) + "'s" +
+                        ChatColor.WHITE + " current score is " + getPoints(args[0]));
             } catch(NullPointerException e) {
                 sender.sendMessage("This player does not exist");
             } catch(ArrayIndexOutOfBoundsException e) {

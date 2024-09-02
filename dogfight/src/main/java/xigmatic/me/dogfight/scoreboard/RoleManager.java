@@ -77,8 +77,13 @@ public class RoleManager {
      * @param player Player to receive equipment
      */
     private void giveSniper(Player player) {
+        // Creates the base crossbow item
         ItemStack crossbow = new ItemStack(Material.CROSSBOW);
+
+        // Adds quick charge V
         crossbow.addUnsafeEnchantment(Enchantment.QUICK_CHARGE, 5);
+
+        // Hides any enchantment data (both appearance and text)
         crossbow.getItemMeta().addItemFlags(ItemFlag.HIDE_ENCHANTS);
 
         // Gives player final item
@@ -91,6 +96,7 @@ public class RoleManager {
      * @param player Player to receive equipment
      */
     private void giveGlider(Player player) {
+        // Creates the base elytra item
         ItemStack elytra = new ItemStack(Material.ELYTRA);
 
         // Gives player final item
@@ -103,6 +109,7 @@ public class RoleManager {
      */
     public void distributeEquipment() {
         for(String playerName : roleMap.keySet()) {
+            // Needs a try in case a player is offline
             try {
                 if (roleMap.get(playerName) == DogfightRole.SNIPER) {
                     // Cannot be null
@@ -112,7 +119,9 @@ public class RoleManager {
                     giveGlider(Bukkit.getPlayer(playerName));
                 }
             } catch (Exception ignored) {
-                Bukkit.getConsoleSender().sendMessage("Could not give equipment to " + playerName + " because they are not online");
+                // Checks if either player is offline and sends a message accordingly
+                Bukkit.getConsoleSender().sendMessage("Could not give equipment to " + playerName +
+                        " because they are not online");
             }
         }
     }
@@ -120,16 +129,29 @@ public class RoleManager {
 
     public void mountPlayerToPlayer() {
         for(String playerName : roleMap.keySet()) {
+            // Needs a try in case a player is offline
             try {
                 if (roleMap.get(playerName) == DogfightRole.GLIDER) {
-                    Entity sniperSeat = Bukkit.getPlayer(playerName).getWorld().spawnEntity(Bukkit.getPlayer(playerName).getLocation(), EntityType.BEE);
+                    // Spawns a bee at the player's feet that the shooting player will be bound to
+                    Entity sniperSeat = Bukkit.getPlayer(playerName).getWorld().spawnEntity(Bukkit.
+                            getPlayer(playerName).getLocation(), EntityType.BEE);
+
+                    // Silences the bee entity on top of the flying player
                     sniperSeat.setSilent(true);
+
+                    // Makes the seat bee invisible
                     ((LivingEntity) sniperSeat).setInvisible(true);
+
+                    // Binds the shooting player on top of the bee
                     sniperSeat.addPassenger(Bukkit.getPlayer(TeamManager.getOtherPlayerOfTeam(playerName)));
+
+                    // Binds the bee to the flying player
                     Bukkit.getPlayer(playerName).addPassenger(sniperSeat);
                 }
             } catch(Exception ignored) {
-                Bukkit.getConsoleSender().sendMessage("Could not mount " + TeamManager.getOtherPlayerOfTeam(playerName) + " because either they or " + playerName + " are not online");
+                // Checks if either player is offline and sends a message accordingly
+                Bukkit.getConsoleSender().sendMessage("Could not mount " + TeamManager.
+                        getOtherPlayerOfTeam(playerName) + " because either they or " + playerName + " are not online");
             }
         }
     }

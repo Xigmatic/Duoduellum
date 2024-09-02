@@ -49,7 +49,8 @@ public class NPCManager {
         ServerGamePacketListenerImpl ps = serverPlayer.connection;
 
         // Creates a list of actions that the packet will send
-        EnumSet<ClientboundPlayerInfoUpdatePacket.Action> actions = EnumSet.noneOf(ClientboundPlayerInfoUpdatePacket.Action.class);
+        EnumSet<ClientboundPlayerInfoUpdatePacket.Action> actions =
+                EnumSet.noneOf(ClientboundPlayerInfoUpdatePacket.Action.class);
         // Adds the npc to player's game
         actions.add(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER);
         // Updates display name
@@ -84,7 +85,8 @@ public class NPCManager {
         ServerGamePacketListenerImpl ps = serverPlayer.connection;
 
         // Creates a list of actions that the packet will send
-        EnumSet<ClientboundPlayerInfoUpdatePacket.Action> actions = EnumSet.noneOf(ClientboundPlayerInfoUpdatePacket.Action.class);
+        EnumSet<ClientboundPlayerInfoUpdatePacket.Action> actions =
+                EnumSet.noneOf(ClientboundPlayerInfoUpdatePacket.Action.class);
         // Adds the npc to player's game
         actions.add(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER);
         // Updates display name
@@ -136,13 +138,32 @@ public class NPCManager {
     }
 
 
+    /**
+     * Adds NPC with specified parameters to the universal NPC HashMap
+     * @param npc ServerPlayer instance to be added
+     */
+    public static void addNpc(ServerPlayer npc) {
+        // Spawns NPC for all players
+        for(Player player : Bukkit.getOnlinePlayers())
+            spawnNPC(player, npc);
+
+        // Adds NPC to npcMap if not already present
+        if(!npcMap.containsKey(npc.getName().toString()))
+            npcMap.put(npc.getName().toString(), npc);
+    }
+
+
+    /**
+     * Removes NPC from all online player's client and removes it from HashMap
+     * @param npcName NPC name to be removed
+     */
     public static void removeNPC(String npcName) {
         ServerPlayer npc;
 
         // Checks if NPC exists in HashMap
-        try {
+        if(npcMap.containsKey(npcName)) {
             npc = npcMap.get(npcName);
-        } catch (Exception ignored) {
+        } else {
             Bukkit.getConsoleSender().sendMessage("Could not remove " + npcName + " because that NPC does not exist");
             return;
         }
@@ -183,9 +204,16 @@ public class NPCManager {
     public static void addTablistNPCs() {
         // Sets the players in the list
         for (TourneyTeam team : TeamManager.getAllTeams()) {
+            // Spacing in player list
+            for(int i = 0; i < 4; i++) {
+                NPCManager.addNPC(i + team.getTeamName(), NPCManager.TRANSPARENT_TEXTURE,
+                        NPCManager.TRANSPARENT_SIGNATURE);
+            }
+
             // Team Name and Logo in player list
             NPCManager.addNPC(team.getTeamName(), NPCManager.TRANSPARENT_TEXTURE, NPCManager.TRANSPARENT_SIGNATURE);
-            NPCManager.addNPC("_" + team.getTeamName(), NPCManager.TRANSPARENT_TEXTURE, NPCManager.TRANSPARENT_SIGNATURE);
+            NPCManager.addNPC("_" + team.getTeamName(), NPCManager.TRANSPARENT_TEXTURE,
+                    NPCManager.TRANSPARENT_SIGNATURE);
             // Checks if player 1 for the team is disconnected and applies disconnected skin if offline
             if (!team.isPlayer1Online())
                 NPCManager.addNPC(team.getPlayer1(), NPCManager.DISCONNECTED_TEXTURE, NPCManager.DISCONNECTED_SIGNATURE);

@@ -14,10 +14,15 @@ public class DisconnectionHandler implements Listener {
 
     @EventHandler
     public void onPlayerDisconnect(PlayerQuitEvent event) {
-        event.setQuitMessage(event.getPlayer().getDisplayName() + " has disconnected");
+        // Gets disconnected player
+        Player player = event.getPlayer();
 
-        if(event.getPlayer().getGameMode() != GameMode.SPECTATOR)
+        // States the player has disconnected
+        event.setQuitMessage(player.getDisplayName() + " has disconnected");
+
+        // Checks for game mode because spectating players are removed from the list throughout the game
+        if(player.getGameMode() != GameMode.SPECTATOR)
             // Adds disconnected NPC to map and updates it for all players
-            NPCManager.addNPC(event.getPlayer().getName(), NPCManager.DISCONNECTED_TEXTURE, NPCManager.DISCONNECTED_SIGNATURE);
+            NPCManager.addNPC(player.getName(), NPCManager.DISCONNECTED_TEXTURE, NPCManager.DISCONNECTED_SIGNATURE);
     }
 }

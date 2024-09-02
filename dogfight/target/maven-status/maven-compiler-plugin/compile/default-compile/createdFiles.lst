@@ -1,3 +1,4 @@
+xigmatic\me\dogfight\tasks\gameplay\PhysicalWorldHandler.class
 xigmatic\me\dogfight\EquipmentManager.class
 xigmatic\me\dogfight\GlowManager.class
 xigmatic\me\dogfight\scoreboard\DogfightRole.class
@@ -16,6 +17,7 @@ xigmatic\me\dogfight\text\TextFunctions.class
 xigmatic\me\dogfight\connection\DisconnectionHandler.class
 xigmatic\me\dogfight\text\ChatManager.class
 xigmatic\me\dogfight\tasks\gameplay\BlockTrailManager.class
+xigmatic\me\dogfight\tasks\gameplay\PointListeners.class
 xigmatic\me\dogfight\connection\ConnectionHandler.class
 xigmatic\me\dogfight\scoreboard\TeamManager.class
 xigmatic\me\dogfight\tasks\DisplayCountdownTask.class

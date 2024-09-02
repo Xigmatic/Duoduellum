@@ -16,7 +16,7 @@ public class TeamManager {
 
     static {
         try {
-            teams = JsonHandler.readTeamList();
+            teams = JsonHandler.refreshTeamList();
         } catch (IOException | ParseException e) {
             throw new RuntimeException(e);
         }
@@ -62,7 +62,8 @@ public class TeamManager {
             if(Bukkit.getPlayer(player) != null) {
                 players.add(Bukkit.getPlayer(player));
             } else {
-                Bukkit.getConsoleSender().sendMessage(player + " is not online. Could not be added to player list in TeamManager.");
+                Bukkit.getConsoleSender().sendMessage(player + " is not online. " +
+                        "Could not be added to player list in TeamManager.");
             }
         }
 
@@ -111,7 +112,8 @@ public class TeamManager {
             if(Bukkit.getPlayer(player) != null) {
                 players.add(Bukkit.getPlayer(player));
             } else {
-                Bukkit.getConsoleSender().sendMessage(player + " is not online. Could not be added to player list in TeamManager.");
+                Bukkit.getConsoleSender().sendMessage(player + " is not online. " +
+                        "Could not be added to player list in TeamManager.");
             }
         }
 
@@ -130,7 +132,8 @@ public class TeamManager {
             if(Bukkit.getPlayer(player) != null) {
                 players.add(Bukkit.getPlayer(player));
             } else {
-                Bukkit.getConsoleSender().sendMessage(player + " is not online. Could not be added to player list in TeamManager.");
+                Bukkit.getConsoleSender().sendMessage(player + " is not online. " +
+                        "Could not be added to player list in TeamManager.");
             }
         }
 
@@ -225,7 +228,8 @@ public class TeamManager {
         String legacy = BaseComponent.toLegacyText(textComponent);
          */
 
-        String logo = ChatManager.jsonToChatString("{text:\" " + getTeamFromPlayerName(playerName).getLogoChar() + " \",color:\"#4e5c24\"}");
+        String logo = ChatManager.jsonToChatString("{text:\" " +
+                getTeamFromPlayerName(playerName).getLogoChar() + " \",color:\"#4e5c24\"}");
         return getPlayerChatColor(playerName) + "●" + logo + ChatColor.WHITE + playerName;
     }
 
@@ -251,8 +255,22 @@ public class TeamManager {
     }
 
 
+    /**
+     * Clears all scoreboard teams to make any conflicts impossible
+     */
     public static void deleteAllTeams() {
-        for(Team team : Bukkit.getServer().getScoreboardManager().getMainScoreboard().getTeams())
-            team.getScoreboard();
+       for(Team team : Bukkit.getServer().getScoreboardManager().getMainScoreboard().getTeams())
+           team.unregister();
+
+    }
+
+
+    /**
+     * Checks whether the player is competing in the tournament
+     * @param playerName Name of player to check
+     * @return Returns true if the player is competing
+     */
+    public static boolean playerIsInTourney(String playerName) {
+        return getAllPlayers().contains(playerName);
     }
 }

@@ -19,6 +19,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
+import xigmatic.me.dogfight.GameManager;
 import xigmatic.me.dogfight.GameState;
 import xigmatic.me.dogfight.scoreboard.RoleManager;
 import xigmatic.me.dogfight.scoreboard.TeamManager;
@@ -26,10 +27,10 @@ import xigmatic.me.dogfight.scoreboard.TeamManager;
 public class InventoryManager implements CommandExecutor, Listener {
     private final Plugin plugin;
     private final RoleManager roleManager;
-    private GameState gameState;
     /**
      * Creates a new InventoryManager
      * @param plugin Pass through main Plugin class
+     * @param roleManager Singleton RoleManager declared in main class
      */
     public InventoryManager(Plugin plugin, RoleManager roleManager) {
         this.plugin = plugin;
@@ -38,16 +39,8 @@ public class InventoryManager implements CommandExecutor, Listener {
 
 
     /**
-     * Sets the GameState associated with InventoryManager (Meant to create parity between GameManager and InventoryManager)
-     * @param newGameState New GameState that InventoryManager reads
-     */
-    public void setGameState(GameState newGameState) {
-        this.gameState = newGameState;
-    }
-
-
-    /**
      * Initializes and opens the selection screen for "Glider" or "Sniper"
+     * @param player Player to open the menu screen
      */
     public void openSelectionScreen(Player player) {
         // Initializes hopper inventory (selection screen)
@@ -142,7 +135,7 @@ public class InventoryManager implements CommandExecutor, Listener {
     public void onInventoryClose(InventoryCloseEvent event) {
         // Prevents Inventory from opening again if the following conditions are met
         // The current gameState is NOT SELECTING1 or SELECTING2
-        if(!(this.gameState == GameState.SELECTING1 || this.gameState == GameState.SELECTING2)
+        if(!(GameManager.getGameState() == GameState.SELECTING1 || GameManager.getGameState() == GameState.SELECTING2)
                 // Inventory type is NOT hopper
                 || event.getInventory().getType() != InventoryType.HOPPER
                 // Player has a role (this identifies if something has already been clicked)

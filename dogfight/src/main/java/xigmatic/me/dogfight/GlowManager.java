@@ -51,7 +51,8 @@ public final class GlowManager {
         final List<WrappedDataValue> wrappedDataValueList = Lists.newArrayList();
         watcher.getWatchableObjects().stream().filter(Objects::nonNull).forEach(entry -> {
             final WrappedDataWatcher.WrappedDataWatcherObject dataWatcherObject = entry.getWatcherObject();
-            wrappedDataValueList.add(new WrappedDataValue(dataWatcherObject.getIndex(), dataWatcherObject.getSerializer(), entry.getRawValue()));
+            wrappedDataValueList.add(new WrappedDataValue(dataWatcherObject.getIndex(),
+                    dataWatcherObject.getSerializer(), entry.getRawValue()));
         });
         packet.getDataValueCollectionModifier().write(0, wrappedDataValueList);
 

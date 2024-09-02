@@ -4,6 +4,7 @@ C:\Users\tncol\IdeaProjects\Duoduellum\dogfight\src\main\java\xigmatic\me\dogfig
 C:\Users\tncol\IdeaProjects\Duoduellum\dogfight\src\main\java\xigmatic\me\dogfight\tasks\CountdownTask.java
 C:\Users\tncol\IdeaProjects\Duoduellum\dogfight\src\main\java\xigmatic\me\dogfight\tasks\gameplay\PlayerLifeManager.java
 C:\Users\tncol\IdeaProjects\Duoduellum\dogfight\src\main\java\xigmatic\me\dogfight\scoreboard\TeamManager.java
+C:\Users\tncol\IdeaProjects\Duoduellum\dogfight\src\main\java\xigmatic\me\dogfight\tasks\gameplay\PointListeners.java
 C:\Users\tncol\IdeaProjects\Duoduellum\dogfight\src\main\java\xigmatic\me\dogfight\scoreboard\ScoreManager.java
 C:\Users\tncol\IdeaProjects\Duoduellum\dogfight\src\main\java\xigmatic\me\dogfight\connection\ConnectionHandler.java
 C:\Users\tncol\IdeaProjects\Duoduellum\dogfight\src\main\java\xigmatic\me\dogfight\EquipmentManager.java
@@ -21,5 +22,6 @@ C:\Users\tncol\IdeaProjects\Duoduellum\dogfight\src\main\java\xigmatic\me\dogfig
 C:\Users\tncol\IdeaProjects\Duoduellum\dogfight\src\main\java\xigmatic\me\dogfight\inventory\InventoryManager.java
 C:\Users\tncol\IdeaProjects\Duoduellum\dogfight\src\main\java\xigmatic\me\dogfight\text\ChatManager.java
 C:\Users\tncol\IdeaProjects\Duoduellum\dogfight\src\main\java\xigmatic\me\dogfight\GlowManager.java
+C:\Users\tncol\IdeaProjects\Duoduellum\dogfight\src\main\java\xigmatic\me\dogfight\tasks\gameplay\PhysicalWorldHandler.java
 C:\Users\tncol\IdeaProjects\Duoduellum\dogfight\src\main\java\xigmatic\me\dogfight\tasks\DisplayCountdownTask.java
 C:\Users\tncol\IdeaProjects\Duoduellum\dogfight\src\main\java\xigmatic\me\dogfight\text\TextFunctions.java

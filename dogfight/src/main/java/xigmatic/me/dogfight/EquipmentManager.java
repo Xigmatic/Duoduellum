@@ -38,12 +38,14 @@ public class EquipmentManager implements CommandExecutor, Listener {
             player.setExp(0.0f);
 
             // Automatically loads a firework into the player's crossbow
-            if(player.getInventory().getItem(0) != null && player.getInventory().getItem(0).getType() == Material.CROSSBOW) {
+            if(player.getInventory().getItem(0) != null &&
+                    player.getInventory().getItem(0).getType() == Material.CROSSBOW) {
                 // Creates firework item
                 ItemStack firework = new ItemStack(Material.FIREWORK_ROCKET);
 
                 // Creates the firework effect (red to gray large ball with trail)
-                FireworkEffect effect = FireworkEffect.builder().withColor(Color.RED).withFade(Color.GRAY).trail(true).with(FireworkEffect.Type.BALL_LARGE).build();
+                FireworkEffect effect = FireworkEffect.builder().withColor(Color.RED).withFade(Color.GRAY).
+                        trail(true).with(FireworkEffect.Type.BALL_LARGE).build();
 
                 // Creates meta and applies it to item
                 FireworkMeta fireworkMeta = (FireworkMeta) firework.getItemMeta();
@@ -79,7 +81,8 @@ public class EquipmentManager implements CommandExecutor, Listener {
         world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 5,0,0,0,0.1);
 
         if(event.getHitEntity() != null)
-            GlowManager.setGlow((Player) event.getEntity().getShooter(), event.getHitEntity(), ((Player) event.getEntity().getShooter()).isSneaking());
+            GlowManager.setGlow((Player) event.getEntity().getShooter(), event.getHitEntity(),
+                    ((Player) event.getEntity().getShooter()).isSneaking());
 
         // Kills entity
         arrow.remove();

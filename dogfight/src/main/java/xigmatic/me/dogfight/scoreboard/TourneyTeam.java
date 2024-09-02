@@ -3,6 +3,8 @@ package xigmatic.me.dogfight.scoreboard;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.ScoreboardManager;
 import org.bukkit.scoreboard.Team;
 import xigmatic.me.dogfight.text.ChatManager;
 
@@ -21,6 +23,7 @@ public class TourneyTeam {
     private final ChatColor chatColor;
     private final String logoChar;
     private final Team scoreboardTeam;
+    private final Team deadTeam;
 
 
     /**
@@ -89,11 +92,6 @@ public class TourneyTeam {
                 this.chatColor = ChatColor.WHITE;
                 break;
 
-            case "gray":
-                this.color = Color.GRAY;
-                this.chatColor = ChatColor.DARK_GRAY;
-                break;
-
             case "black":
                 this.color = Color.BLACK;
                 this.chatColor = ChatColor.BLACK;
@@ -105,49 +103,48 @@ public class TourneyTeam {
                 break;
         }
 
-        // Removes any existing team with the passed team name to prepare for creating a new one
-        try {
-            Bukkit.getScoreboardManager().getMainScoreboard().getTeam(teamName.substring(0,teamName.length()) + "c").unregister();
-        } catch(Exception ignore) {
-            // Confirms that no team had the team name
-            Bukkit.getConsoleSender().sendMessage("No scoreboard team conflict with " + teamName + "c");
-        }
-        try {
-            Bukkit.getScoreboardManager().getMainScoreboard().getTeam(teamName + "b").unregister();
-        } catch(Exception ignore) {
-            // Confirms that no team had the team name
-            Bukkit.getConsoleSender().sendMessage("No scoreboard team conflict with " + teamName + "b");
-        }
-        try {
-            Bukkit.getScoreboardManager().getMainScoreboard().getTeam(teamName.substring(0,teamName.length()) + "a").unregister();
-        } catch(Exception ignore) {
-            // Confirms that no team had the team name
-            Bukkit.getConsoleSender().sendMessage("No scoreboard team conflict with " + teamName + "a");
-        }
+        Scoreboard mainScoreboard = Bukkit.getServer().getScoreboardManager().getMainScoreboard();
+
+        if(mainScoreboard.getTeam(teamName + "a") != null)
+            mainScoreboard.getTeam(teamName + "a").unregister();
+        if(mainScoreboard.getTeam(teamName + "b") != null)
+            mainScoreboard.getTeam(teamName + "b").unregister();
+        if(mainScoreboard.getTeam(teamName + "c") != null)
+            mainScoreboard.getTeam(teamName + "c").unregister();
+        if(mainScoreboard.getTeam(teamName + "d") != null)
+            mainScoreboard.getTeam(teamName + "d").unregister();
+        if(mainScoreboard.getTeam(teamName + "e") != null)
+            mainScoreboard.getTeam(teamName + "e").unregister();
 
 
+        // Creates spacing before team entry
+        Team tablistSpacingTeam = mainScoreboard.registerNewTeam(teamName + "e");
+        tablistSpacingTeam.setColor(ChatColor.GRAY);
+        for(int i = 0; i < 4; i++)
+            tablistSpacingTeam.addEntry(i + teamName);
+
+        // Creates Tab-list team entry that diplays the logo only
+        Team tablistTeamLogo = mainScoreboard.registerNewTeam(teamName + "a");
+        tablistTeamLogo.setColor(ChatColor.GRAY);
+        tablistTeamLogo.setPrefix(ChatColor.WHITE + "⓿⓿⓿⓿⓿⓿⓿⓿⓿" + logoChar);
+        tablistTeamLogo.addEntry("_" + teamName);
+
+        // Creates Tab-list team entry that displays the team name only
+        Team tablistTeamName = mainScoreboard.registerNewTeam(teamName + "b");
+        tablistTeamName.setColor(ChatColor.GRAY);
+        tablistTeamName.setPrefix("⑿" + ChatColor.WHITE + ChatColor.ITALIC + ChatColor.BOLD + teamName);
+        tablistTeamName.addEntry(teamName);
 
         // Creates a team on the in-game scoreboard (ONLY FOR COLORS)
-        this.scoreboardTeam = Bukkit.getScoreboardManager().getMainScoreboard().registerNewTeam(teamName + "c");
+        this.scoreboardTeam = mainScoreboard.registerNewTeam(teamName + "c");
         this.scoreboardTeam.setColor(chatColor);
         this.scoreboardTeam.setPrefix(this.chatColor + "●" + ChatColor.WHITE + " ");
         this.scoreboardTeam.addEntry(player1);
         this.scoreboardTeam.addEntry(player2);
 
-        // Creates Tab-list team entry that displays the team name only
-        Team tablistTeamName = Bukkit.getScoreboardManager().getMainScoreboard().registerNewTeam(teamName + "b");
-        tablistTeamName.setColor(ChatColor.GRAY);
-        tablistTeamName.setPrefix("⑿" + ChatColor.WHITE + ChatColor.ITALIC + ChatColor.BOLD + teamName);
-        tablistTeamName.addEntry(teamName);
-
-        // Creates Tab-list team entry that diplays the logo only
-        Team tablistTeamLogo = Bukkit.getScoreboardManager().getMainScoreboard().registerNewTeam(teamName + "a");
-        tablistTeamLogo.setColor(ChatColor.GRAY);
-        tablistTeamLogo.setPrefix(ChatColor.WHITE + "⓿⓿⓿⓿⓿⓿⓿⓿⓿" + logoChar);
-        tablistTeamLogo.addEntry("_" + teamName);
-
-        // Sets the player's chat name to the formatted one (dot logo name)
-        //Bukkit.getPlayer(player1).
+        this.deadTeam = mainScoreboard.registerNewTeam(teamName + "d");
+        this.deadTeam.setColor(ChatColor.DARK_GRAY);
+        this.deadTeam.setPrefix(ChatColor.DARK_GRAY + "⑵☠⑵");
     }
 
 
@@ -219,7 +216,7 @@ public class TourneyTeam {
      * @return If player 1 is online
      */
     public boolean isPlayer1Online() {
-        return Bukkit.getPlayer(this.p1) != null;
+        return Bukkit.getPlayerExact(this.p1) != null;
     }
 
 
@@ -228,27 +225,34 @@ public class TourneyTeam {
      * @return If player 2 is online
      */
     public boolean isPlayer2Online() {
-
-        return Bukkit.getPlayer(this.p2) != null;
+        return Bukkit.getPlayerExact(this.p2) != null;
     }
 
 
     /**
-     * Diagnostic method to test how chat colors look in-game
+     * Adds player to dead team (does not have to be an actual player)
+     * @param playerName Player to add to dead team
      */
-    public static void testChatColors() {
-        Bukkit.broadcastMessage(ChatColor.RED + "This is red");
-        Bukkit.broadcastMessage(ChatColor.GOLD + "This is orange");
-        Bukkit.broadcastMessage(ChatColor.YELLOW + "This is yellow");
-        Bukkit.broadcastMessage(ChatColor.GREEN + "This is lime");
-        Bukkit.broadcastMessage(ChatColor.DARK_GREEN + "This is green");
-        Bukkit.broadcastMessage(ChatColor.AQUA + "This is light blue");
-        Bukkit.broadcastMessage(ChatColor.DARK_AQUA + "This is cyan");
-        Bukkit.broadcastMessage(ChatColor.DARK_BLUE + "This is blue");
-        Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + "This is purple");
-        Bukkit.broadcastMessage(ChatColor.LIGHT_PURPLE + "This is pink");
-        Bukkit.broadcastMessage(ChatColor.WHITE + "This is white");
-        Bukkit.broadcastMessage(ChatColor.DARK_GRAY + "This is gray");
-        Bukkit.broadcastMessage(ChatColor.BLACK + "This is black");
+    public void addToDeadTeam(String playerName) {
+        this.deadTeam.addEntry(playerName);
     }
+
+
+    /**
+     * Clears dead team
+     */
+    public void clearDeadTeam() {
+        for(String playerName : this.deadTeam.getEntries())
+            this.deadTeam.removeEntry(playerName);
+    }
+
+
+    /**
+     * Returns the team of dead players
+     * @return Score team of dead players on the team
+     */
+    public Team getDeadTeam() {
+        return this.deadTeam;
+    }
+
 }
