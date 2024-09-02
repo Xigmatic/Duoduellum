@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Duoduellum Scores</title>
+        <link rel="stylesheet" href="./StatsWebsite/style.css">
+    </head>
+    <body style="background-color:white; margin: 0px" id="body" onscroll="scrollFunction()">
+
+        <h1 style="text-align:center">This is a Heading</h1>
+        <p style="text-align:center">This is a paragraph.</p>
+
+        <canvas id="rankCanvas" width="1000" height="500" style="margin-bottom: 50px; margin-left:auto; margin-right:auto; display:block; border:1px solid"></canvas>
+    
+        <img src="./StatsWebsite/arrow.png" id="backToTop" style="user-select: none; bottom: 10px; right: 0px; width: 50px; height: 50px; position: fixed;" draggable="false" onscroll="scrollFunction()">
+        <script>
+            scrollFunction();
+            function scrollFunction() {
+                let scrollPos = window.scrollY;
+                let backToTopArrow = document.getElementById("backToTop");
+                if(scrollPos > 500) {
+                    backToTopArrow.style.right = "10px";
+                } else {
+                    backToTopArrow.style.right = `${((scrollPos)/5)-90}px`;
+                }
+            }
+        </script>
+
+    </body>
+
+    
+
+
+    <div id="image-container" style="display:none"></div>
+
+    <script src="./StatsWebsite/script.js" type="module"></script>
+    <script src="./StatsWebsite/scoresHandler.js" type="module"></script>
+    <script src="./StatsWebsite/colorFunctions.js" type="module"></script>
+
+</html>
